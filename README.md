@@ -1,7 +1,7 @@
 # README #
 
 Repository that contains various site configuration files for [python-microscopy](http://python-microscopy.org).
-These config files are developed as part of Christian Soeller's laboratory at the University of Exeter.
+These config files are developed and maintained in Christian Soeller's laboratory at the University of Exeter.
 
 ### Who is this for? ###
 
