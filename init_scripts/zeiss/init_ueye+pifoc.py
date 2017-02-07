@@ -28,10 +28,6 @@ from PYME.Acquire.Hardware.uc480 import uCam480
 
 from PYME.Acquire.Hardware import fakeShutters
 import time
-import os
-import sys
-
-from PYME.Acquire import MetaDataHandler
 
 InitBG('EMCCD Cameras', '''
 uCam480.init(cameratype='ueye')

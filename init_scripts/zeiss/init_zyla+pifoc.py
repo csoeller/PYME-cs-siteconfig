@@ -28,11 +28,6 @@ import scipy
 from PYME.Acquire.Hardware.Simulator import fakeCam, fakePiezo
 from PYME.Acquire.Hardware import fakeShutters
 import time
-import os
-import sys
-
-
-from PYME.IO import MetaDataHandler
 
 InitBG('Andor Zyla', '''
 from PYME.Acquire.Hardware.AndorNeo import AndorZyla

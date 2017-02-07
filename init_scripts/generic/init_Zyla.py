@@ -24,8 +24,6 @@
 from PYME.Acquire.Hardware.AndorNeo import ZylaControlPanel
 from PYME.Acquire.Hardware.AndorNeo import AndorZyla
 
-import scipy
-from PYME.Acquire.Hardware.Simulator import fakeCam, fakePiezo
 from PYME.Acquire.Hardware import fakeShutters
 import time
 
@@ -44,8 +42,9 @@ camPanels.append((scope.camControls['Zyla'], 'sCMOS Properties'))
 ''')
 
 InitGUI('''
-from PYME.Acquire import sampleInformation
+from PYME.Acquire import sampleInformationDjangoDirect as sampleInformation
 sampPan = sampleInformation.slidePanel(MainFrame)
+MetaDataHandler.provideStartMetadata.append(lambda mdh: sampleInformation.getSampleDataFailesafe(MainFrame,mdh))
 camPanels.append((sampPan, 'Current Slide'))
 ''')
 
