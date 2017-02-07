@@ -55,7 +55,7 @@ camPanels.append((scope.camControls['Zyla'], 'sCMOS Properties'))
 ''')
 
 InitGUI('''
-from PYME.Acquire import sampleInformation
+from PYME.Acquire import sampleInformationDjangoDirect as sampleInformation
 sampPan = sampleInformation.slidePanel(MainFrame)
 camPanels.append((sampPan, 'Current Slide'))
 ''')
@@ -83,7 +83,7 @@ InitGUI('''
 from PYME.Acquire.Hardware import NikonTi
 scope.zStage = NikonTi.zDrive()
 scope.piezos.append((scope.zStage, 1, 'Z Stepper'))
-''')# % GetComputerName())
+''')
 
 #Nikon Ti motorised controls
 InitGUI('''
@@ -99,88 +99,13 @@ time1.WantNotification.append(scope.lightpath.Poll)
 
 MetaDataHandler.provideStartMetadata.append(scope.dichroic.ProvideMetadata)
 MetaDataHandler.provideStartMetadata.append(scope.lightpath.ProvideMetadata)
-''')# % GetComputerName())
+''')
 
 InitGUI('''
 from PYME.Acquire.Hardware import focusKeys
 fk = focusKeys.FocusKeys(MainFrame, menuBar1, scope.piezos[0], scope=scope)
 time1.WantNotification.append(fk.refresh)
 ''')
-
-#from PYME.Acquire.Hardware import frZStage
-#frz = frZStage.frZStepper(MainFrame, scope.zStage)
-#frz.Show()
-
-##3-axis piezo
-#InitBG('Thorlabs Piezo', '''
-#from PYME.Acquire.Hardware import thorlabsPiezo
-#
-##check to see what we've got attached
-#piezoSerialNums = thorlabsPiezo.EnumeratePiezos()
-#if len(piezoSerialNums) == 3: #expect to see 3 piezos
-#    scope.pzx = thorlabsPiezo.TLPiezo(91814461, 'X Axis')
-#    scope.pzy = thorlabsPiezo.TLPiezo(91814462, 'Y Axis')
-#    scope.pzz = thorlabsPiezo.TLPiezo(91814463, 'Z Axis')
-#
-#    scope.piezos.append((scope.pzx, 1, 'X Piezo'))
-#    scope.piezos.append((scope.pzy, 1, 'Y Piezo'))
-#    scope.piezos.append((scope.pzz, 1, 'Z Piezo'))
-#
-#    #centre the piezos
-#    scope.pzx.MoveTo(0,50)
-#    scope.pzy.MoveTo(0,50)
-#    scope.pzz.MoveTo(0,40)
-#else:
-#    raise HWNotPresent
-#
-#''')
-    
-##from PYME.Acquire.Hardware.FilterWheel import WFilter, FiltFrame
-##filtList = [WFilter(1, 'EMPTY', 'EMPTY', 0),
-##    WFilter(2, 'ND.5' , 'UVND 0.5', 0.5),
-##    WFilter(3, 'ND1'  , 'UVND 1'  , 1),
-##    WFilter(4, 'ND2', 'UVND 2', 2),
-##    WFilter(5, 'ND3'  , 'UVND 3'  , 3),
-##    WFilter(6, 'ND4'  , 'UVND 4'  , 4)]
-##
-##InitGUI('''
-##try:
-##    scope.filterWheel = FiltFrame(MainFrame, filtList, 'COM4')
-##    scope.filterWheel.SetFilterPos("ND4")
-##    toolPanels.append((scope.filterWheel, 'Filter Wheel'))
-##except:
-##    print 'Error starting filter wheel ...'
-##''')
-
-
-#DigiData
-##from PYME.Acquire.Hardware import phoxxLaser
-##scope.l642 = phoxxLaser.PhoxxLaser('642')
-##scope.StatusCallbacks.append(scope.l642.GetStatusText)
-##scope.lasers = [scope.l642]
-scope.lasers = []
-
-#from PYME.Acquire.Hardware import priorLumen
-#scope.arclamp = priorLumen.PriorLumen('Arc Lamp', portname='COM6')
-#scope.lasers.append(scope.arclamp)
-
-#InitBG('DigiData', '''
-#from PYME.Acquire.Hardware.DigiData import DigiDataClient
-#dd = DigiDataClient.getDDClient()
-#
-#
-#from PYME.Acquire.Hardware import lasers
-#scope.l490 = lasers.DigiDataSwitchedLaser('490',dd,4)
-#scope.l405 = lasers.DigiDataSwitchedLaserInvPol('405',dd,0)
-##scope.l543 = lasers.DigiDataSwitchedAnalogLaser('543',dd,0)
-##scope.l671 = lasers.DigiDataSwitchedAnalogLaser('671',dd,1)
-#
-#pport = lasers.PPort()
-#scope.l671 = lasers.ParallelSwitchedLaser('671',pport,0)
-#scope.l532 = lasers.ParallelSwitchedLaser('532',pport,1)
-#
-#scope.lasers = [scope.l405,scope.l532,scope.l671, scope.l490]
-#''')
 
 InitGUI('''
 if 'lasers'in dir(scope):
@@ -189,24 +114,6 @@ if 'lasers'in dir(scope):
     time1.WantNotification.append(lcf.refresh)
     toolPanels.append((lcf, 'Laser Control'))
 ''')
-#
-#from PYME.Acquire.Hardware import PM100USB
-#
-#scope.powerMeter = PM100USB.PowerMeter()
-#scope.powerMeter.SetWavelength(671)
-#scope.StatusCallbacks.append(scope.powerMeter.GetStatusText)
-
-##Focus tracking
-#from PYME.Acquire.Hardware import FocCorrR
-#InitBG('Focus Corrector', '''
-#scope.fc = FocCorrR.FocusCorrector(scope.zStage, tolerance=0.20000000000000001, estSlopeDyn=False, recDrift=False, axis='Y', guideLaser=l488)
-#scope.StatusCallbacks.append(fc.GetStatus)
-#''')
-#InitGUI('''
-#if 'fc' in dir(scope):
-#    scope.fc.addMenuItems(MainFrame, MainMenu)
-#    scope.fc.Start(2000)
-#''')
 
 from PYME import cSMI
 
