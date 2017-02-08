@@ -55,7 +55,7 @@ camPanels.append((scope.camControls['Zyla'], 'sCMOS Properties'))
 ''')
 
 InitGUI('''
-from PYME.Acquire import sampleInformationDjangoDirect as sampleInformation
+from PYME.Acquire import sampleInformation
 sampPan = sampleInformation.slidePanel(MainFrame)
 camPanels.append((sampPan, 'Current Slide'))
 ''')
