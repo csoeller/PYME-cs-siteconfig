@@ -9,6 +9,9 @@ def get_init_directories_to_search():
     if not extra_conf_dir is None:
         directories_to_search.insert(0, extra_conf_dir)
 
+    legacy_scripts_dir = os.path.join(os.path.dirname(config.__file__), 'Acquire/Scripts')
+    directories_to_search.insert(0, legacy_scripts_dir)
+    
     return directories_to_search
 
 def list_config_dirs():
