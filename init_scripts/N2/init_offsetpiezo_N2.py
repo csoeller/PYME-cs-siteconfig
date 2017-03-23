@@ -23,10 +23,7 @@
 
 #from PYME.Acquire.Hardware.AndorIXon import AndorIXon
 from PYME.Acquire.Hardware.AndorNeo import AndorZyla
-from PYME.Acquire.Hardware.AndorNeo import ZylaControlPanel
-from PYME.Acquire.Hardware.AndorIXon import AndorControlFrame
 
-from PYME.Acquire.Hardware.Simulator import fakeCam, fakePiezo
 from PYME.Acquire.Hardware import fakeShutters
 import time
 import os
@@ -41,20 +38,22 @@ def GetComputerName():
 
 #scope.cameras = {}
 #scope.camControls = {}
-from PYME.IO import MetaDataHandler
 
-InitBG('Andor Zyla', '''
+
+InitBG('Andor Zyla', """
 scope.cameras['Zyla'] =  AndorZyla.AndorZyla(0)
 scope.cam = scope.cameras['Zyla']
 scope.cameras['Zyla'].Init()
 scope.cameras['Zyla'].port = 'R100'
 scope.cameras['Zyla'].orientation = dict(rotate=False, flipx=False, flipy=False)
-''')
+scope.cameras['Zyla'].DefaultEMGain = 0 #hack to make camera work with standard protocols
+""")
 
-InitGUI('''
+InitGUI("""
+from PYME.Acquire.Hardware.AndorNeo import ZylaControlPanel
 scope.camControls['Zyla'] = ZylaControlPanel.ZylaControl(MainFrame, scope.cameras['Zyla'], scope)
 camPanels.append((scope.camControls['Zyla'], 'sCMOS Properties'))
-''')
+""")
 
 
 
@@ -64,6 +63,7 @@ camPanels.append((scope.camControls['Zyla'], 'sCMOS Properties'))
 # camPanels.append((sampPan, 'Current Slide'))
 # ''')
 InitGUI("""
+from PYME.IO import MetaDataHandler
 from PYME.Acquire import sampleInformationDjangoDirect as sampleInformation
 sampPan = sampleInformation.slidePanel(MainFrame)
 MetaDataHandler.provideStartMetadata.append(lambda mdh: sampleInformation.getSampleDataFailesafe(MainFrame,mdh))
@@ -71,63 +71,60 @@ camPanels.append((sampPan, 'Current Slide'))
 """)
 
 #setup for the channels to aquire - b/w camera, no shutters
-class chaninfo:
-    names = ['bw']
-    cols = [1] #1 = b/w, 2 = R, 4 = G1, 8 = G2, 16 = B
-    hw = [fakeShutters.CH1] #unimportant - as we have no shutters
-    itimes = [100]
+# class chaninfo:
+#     names = ['bw']
+#     cols = [1] #1 = b/w, 2 = R, 4 = G1, 8 = G2, 16 = B
+#     hw = [fakeShutters.CH1] #unimportant - as we have no shutters
+#     itimes = [100]
 
-scope.chaninfo = chaninfo
-scope.shutters = fakeShutters
+# scope.chaninfo = chaninfo
+# scope.shutters = fakeShutters
 
-InitGUI('''
+InitGUI("""
 from PYME.Acquire import sarcSpacing
 ssp = sarcSpacing.SarcomereChecker(MainFrame, menuBar1, scope)
-''')
+""")
 
 
 
-
-#Z stage
-#InitGUI('''
-#from PYME.Acquire.Hardware import NikonTi
-#scope.zStage = NikonTi.zDrive()
-#scope.piezos.append((scope.zStage, 1, 'Z Stepper'))
-#''')# % GetComputerName())
-
-InitBG('Z Piezo', '''
+InitBG('Z Piezo', """
 from PYME.Acquire.Hardware.Piezos import piezo_e709, offsetPiezo
 
 scope._piFoc = piezo_e709.piezo_e709T('COM20', 400, 0, True)
 scope.hardwareChecks.append(scope._piFoc.OnTarget)
 scope.CleanupFunctions.append(scope._piFoc.close)
 scope.piFoc = offsetPiezo.piezoOffsetProxy(scope._piFoc)
-scope.piezos.append((scope.piFoc, 1, 'PIFoc'))
-scope.positioning['z'] = (scope.piFoc, 1, 1)
+scope.register_piezo(scope.piFoc, 'z')
+#scope.piezos.append((scope.piFoc, 1, 'PIFoc'))
+#scope.positioning['z'] = (scope.piFoc, 1, 1)
 
 #server so drift correction can connect to the piezo
-scope.pst = offsetPiezo.ServerThread(scope.piFoc)
-scope.pst.start()
-scope.CleanupFunctions.append(scope.pst.cleanup)
+pst = offsetPiezo.ServerThread(scope.piFoc)
+pst.start()
+scope.CleanupFunctions.append(pst.cleanup)
 
-scope.state.registerHandler('Positioning.z', lambda : scope.piFoc.GetPos(1), lambda v : scope.piFoc.MoveTo(1, v))
-''')
+#scope.state.registerHandler('Positioning.z', lambda : scope.piFoc.GetPos(1), lambda v : scope.piFoc.MoveTo(1, v))
+""")
 
-#Nikon Ti motorised controls
-InitGUI('''
-from PYME.Acquire.Hardware import NikonTi, NikonTiGUI
-scope.dichroic = NikonTi.FilterChanger()
-scope.lightpath = NikonTi.LightPath()
+InitBG('XY Stage', """
+#XY Stage
+from PYME.Acquire.Hardware.Piezos import piezo_c867
+scope.xystage = piezo_c867.piezo_c867T('COM16')
+#scope.piezos.append((scope.xystage, 2, 'Stage_X'))
+#scope.piezos.append((scope.xystage, 1, 'Stage_Y'))
+scope.joystick = piezo_c867.c867Joystick(scope.xystage)
+#scope.joystick.Enable(True)
+scope.hardwareChecks.append(scope.xystage.OnTarget)
+scope.CleanupFunctions.append(scope.xystage.close)
 
-TiPanel = NikonTiGUI.TiPanel(MainFrame, scope.dichroic, scope.lightpath)
-toolPanels.append((TiPanel, 'Nikon Ti'))
-#time1.WantNotification.append(TiPanel.SetSelections)
-time1.WantNotification.append(scope.dichroic.Poll)
-time1.WantNotification.append(scope.lightpath.Poll)
+scope.register_piezo(scope.xystage, 'x', channel=1)
+scope.register_piezo(scope.xystage, 'y', channel=2, multiplier=-1)
+#scope.positioning['x'] = (scope.xystage, 1, 1000)
+#scope.positioning['y'] = (scope.xystage, 2, -1000)
 
-MetaDataHandler.provideStartMetadata.append(scope.dichroic.ProvideMetadata)
-MetaDataHandler.provideStartMetadata.append(scope.lightpath.ProvideMetadata)
-''')# % GetComputerName())
+#scope.state.registerHandler('Positioning.x', lambda : 1000*scope.xystage.GetPos(1), lambda v : scope.xystage.MoveTo(1, v*1e-3))
+#scope.state.registerHandler('Positioning.y', lambda : -1000*scope.xystage.GetPos(2), lambda v : scope.xystage.MoveTo(2, -v*1e-3))
+""")
 
 InitGUI("""
 from PYME.Acquire import positionTracker
@@ -143,13 +140,89 @@ from PYME.Acquire.Hardware import splitter
 splt = splitter.Splitter(MainFrame, scope, scope.cam, flipChan = 0, transLocOnCamera = 'Left', flip=False, dir='left_right', constrain=False)
 """)
 
-InitGUI('''
+#Nikon Ti motorised controls
+InitGUI("""
+from PYME.Acquire.Hardware import NikonTi, NikonTiGUI
+scope.dichroic = NikonTi.FilterChanger()
+scope.lightpath = NikonTi.LightPath()
+
+TiPanel = NikonTiGUI.TiPanel(MainFrame, scope.dichroic, scope.lightpath)
+toolPanels.append((TiPanel, 'Nikon Ti'))
+#time1.WantNotification.append(TiPanel.SetSelections)
+time1.WantNotification.append(scope.dichroic.Poll)
+time1.WantNotification.append(scope.lightpath.Poll)
+
+MetaDataHandler.provideStartMetadata.append(scope.dichroic.ProvideMetadata)
+MetaDataHandler.provideStartMetadata.append(scope.lightpath.ProvideMetadata)
+""")# % GetComputerName())
+
+
+
+InitGUI("""
+from PYME.Acquire.Hardware import spacenav
+scope.spacenav = spacenav.SpaceNavigator()
+scope.CleanupFunctions.append(scope.spacenav.close)
+scope.ctrl3d = spacenav.SpaceNavPiezoCtrl(scope.spacenav, scope.piFoc, scope.xystage)
+""")
+
+
+InitGUI("""
 from PYME.Acquire.Hardware import focusKeys
 fk = focusKeys.FocusKeys(MainFrame, scope.piezos[0], scope=scope)
 time1.WantNotification.append(fk.refresh)
-''')
+""")
 
 
+InitGUI("""
+from PYME.Acquire.Hardware import focusKeys
+Posk = focusKeys.PositionKeys(MainFrame, menuBar1, scope.piezos[1], scope.piezos[2], scope=scope)
+#time1.WantNotification.append(fk.refresh)
+""")
+
+
+
+InitGUI("""
+from PYME.Acquire.Hardware.FilterWheel import WFilter, FiltFrame, FiltWheel
+filtList = [WFilter(1, 'EMPTY', 'EMPTY', 0),
+    WFilter(2, 'ND.5' , 'UVND 0.5', 0.5),
+    WFilter(3, 'ND1'  , 'UVND 1'  , 1),
+    WFilter(4, 'ND2', 'UVND 2', 2),
+    WFilter(5, 'ND3'  , 'UVND 3'  , 3),
+    WFilter(6, 'ND4'  , 'UVND 4'  , 4)]
+try:
+    scope.filterWheel = FiltWheel(filtList, 'COM21')
+    #scope.filterWheel.SetFilterPos("LF488")
+    scope.filtPan = FiltFrame(MainFrame, scope.filterWheel)
+    toolPanels.append((scope.filtPan, 'Filter Wheel'))
+except:
+    print 'Error starting filter wheel ...'
+""")
+
+
+
+InitGUI("""
+from PYME.Acquire.Hardware import ExciterWheel
+exciterList = [ExciterWheel.WFilter(1, 'GFP', 'GFP exciter', 0),
+    ExciterWheel.WFilter(2, 'TxRed' , 'TxRed exciter', 0),
+    ExciterWheel.WFilter(3, 'Cy5'  , 'Cy5 exciter'  , 0),
+    ExciterWheel.WFilter(4, 'Cy5.5', 'Cy5.5 exciter', 0),
+    ExciterWheel.WFilter(5, 'Cy7'  , 'Cy7 exciter'  , 0),
+    ExciterWheel.WFilter(6, 'ND4'  , 'ND4'  , 0)]
+
+filterpair = [ExciterWheel.FilterPair('GFP', 'GFP'),
+    ExciterWheel.FilterPair('TxRed', 'TxRed'),
+    ExciterWheel.FilterPair('Cy5', 'Cy5'),
+    ExciterWheel.FilterPair('Cy5.5', 'Cy5.5'),
+    ExciterWheel.FilterPair('Cy7', 'Cy7'),
+    ExciterWheel.FilterPair('To be added', 'To be added')]
+try:
+    scope.exciterWheel = ExciterWheel.FiltWheel(exciterList, filterpair, 'COM22', dichroic=scope.dichroic)
+    #scope.filterWheel.SetFilterPos("LF488")
+    scope.exciterPan = ExciterWheel.FiltFrame(MainFrame, scope.exciterWheel)
+    toolPanels.append((scope.exciterPan, 'Exciter Wheel'))
+except:
+    print 'Error starting exciter wheel ...'
+""")
 
 #we don't have a splitter - make sure that the analysis knows this
 #scope.mdh['Splitter.Flip'] = False
@@ -183,22 +256,7 @@ time1.WantNotification.append(fk.refresh)
 #
 #''')
     
-##from PYME.Acquire.Hardware.FilterWheel import WFilter, FiltFrame
-##filtList = [WFilter(1, 'EMPTY', 'EMPTY', 0),
-##    WFilter(2, 'ND.5' , 'UVND 0.5', 0.5),
-##    WFilter(3, 'ND1'  , 'UVND 1'  , 1),
-##    WFilter(4, 'ND2', 'UVND 2', 2),
-##    WFilter(5, 'ND3'  , 'UVND 3'  , 3),
-##    WFilter(6, 'ND4'  , 'UVND 4'  , 4)]
-##
-##InitGUI('''
-##try:
-##    scope.filterWheel = FiltFrame(MainFrame, filtList, 'COM4')
-##    scope.filterWheel.SetFilterPos("ND4")
-##    toolPanels.append((scope.filterWheel, 'Filter Wheel'))
-##except:
-##    print 'Error starting filter wheel ...'
-##''')
+
 
 
 #DigiData
@@ -223,99 +281,28 @@ scope.StatusCallbacks.append(scope.l647.GetStatusText)
 scope.lasers = [scope.l671, scope.l405, scope.l647, scope.l532]
 
 
-InitGUI('''
+InitGUI("""
 from PYME.Acquire import lasersliders
 lsf = lasersliders.LaserSliders(toolPanel, scope.lasers)
 time1.WantNotification.append(lsf.update)
 #lsf.update()
 camPanels.append((lsf, 'Laser Powers'))
-''')
+""")
 
-InitGUI('''
+InitGUI("""
 if 'lasers'in dir(scope):
     from PYME.Acquire.Hardware import LaserControlFrame
     lcf = LaserControlFrame.LaserControlLight(MainFrame,scope.lasers)
     time1.WantNotification.append(lcf.refresh)
     camPanels.append((lcf, 'Laser Control'))
-''')
-
-from PYME.Acquire.Hardware.FilterWheel import WFilter, FiltFrame, FiltWheel
-filtList = [WFilter(1, 'EMPTY', 'EMPTY', 0),
-    WFilter(2, 'ND.5' , 'UVND 0.5', 0.5),
-    WFilter(3, 'ND1'  , 'UVND 1'  , 1),
-    WFilter(4, 'ND2', 'UVND 2', 2),
-    WFilter(5, 'ND3'  , 'UVND 3'  , 3),
-    WFilter(6, 'ND4'  , 'UVND 4'  , 4)]
-
-InitGUI('''
-try:
-    scope.filterWheel = FiltWheel(filtList, 'COM21')
-    #scope.filterWheel.SetFilterPos("LF488")
-    scope.filtPan = FiltFrame(MainFrame, scope.filterWheel)
-    toolPanels.append((scope.filtPan, 'Filter Wheel'))
-except:
-    print 'Error starting filter wheel ...'
-''')
-
-from PYME.Acquire.Hardware import ExciterWheel
-exciterList = [ExciterWheel.WFilter(1, 'GFP', 'GFP exciter', 0),
-    ExciterWheel.WFilter(2, 'TxRed' , 'TxRed exciter', 0),
-    ExciterWheel.WFilter(3, 'Cy5'  , 'Cy5 exciter'  , 0),
-    ExciterWheel.WFilter(4, 'Cy5.5', 'Cy5.5 exciter', 0),
-    ExciterWheel.WFilter(5, 'Cy7'  , 'Cy7 exciter'  , 0),
-    ExciterWheel.WFilter(6, 'ND4'  , 'ND4'  , 0)]
-
-filterpair = [ExciterWheel.FilterPair('GFP', 'GFP'),
-    ExciterWheel.FilterPair('TxRed', 'TxRed'),
-    ExciterWheel.FilterPair('Cy5', 'Cy5'),
-    ExciterWheel.FilterPair('Cy5.5', 'Cy5.5'),
-    ExciterWheel.FilterPair('Cy7', 'Cy7'),
-    ExciterWheel.FilterPair('To be added', 'To be added')]
-
-InitGUI('''
-try:
-    scope.exciterWheel = ExciterWheel.FiltWheel(exciterList, filterpair, 'COM22', dichroic=scope.dichroic)
-    #scope.filterWheel.SetFilterPos("LF488")
-    scope.exciterPan = ExciterWheel.FiltFrame(MainFrame, scope.exciterWheel)
-    toolPanels.append((scope.exciterPan, 'Exciter Wheel'))
-except:
-    print 'Error starting exciter wheel ...'
-''')
+""")
 
 
-InitBG('XY Stage', '''
-#XY Stage
-from PYME.Acquire.Hardware.Piezos import piezo_c867
-scope.xystage = piezo_c867.piezo_c867T('COM16')
-scope.piezos.append((scope.xystage, 2, 'Stage_X'))
-scope.piezos.append((scope.xystage, 1, 'Stage_Y'))
-scope.joystick = piezo_c867.c867Joystick(scope.xystage)
-#scope.joystick.Enable(True)
-scope.hardwareChecks.append(scope.xystage.OnTarget)
-scope.CleanupFunctions.append(scope.xystage.close)
 
-scope.positioning['x'] = (scope.xystage, 1, 1000)
-scope.positioning['y'] = (scope.xystage, 2, -1000)
 
-scope.state.registerHandler('Positioning.x', lambda : 1000*scope.xystage.GetPos(1), lambda v : scope.xystage.MoveTo(1, v*1e-3))
-scope.state.registerHandler('Positioning.y', lambda : -1000*scope.xystage.GetPos(2), lambda v : scope.xystage.MoveTo(2, -v*1e-3))
-''')
 
-InitGUI('''
-from PYME.Acquire.Hardware import focusKeys
-Posk = focusKeys.PositionKeys(MainFrame, menuBar1, scope.piezos[1], scope.piezos[2], scope=scope)
-#time1.WantNotification.append(fk.refresh)
-''')
-
-InitGUI('''
-from PYME.Acquire.Hardware import spacenav
-scope.spacenav = spacenav.SpaceNavigator()
-scope.CleanupFunctions.append(scope.spacenav.close)
-scope.ctrl3d = spacenav.SpaceNavPiezoCtrl(scope.spacenav, scope.piFoc, scope.xystage)
-''')
-
+InitGUI("""
 from PYME.Acquire.Hardware import priorLumen, arclampshutterpanel
-InitGUI('''
 try:
     scope.arclampshutter = priorLumen.PriorLumen('Arc lamp shutter', portname='COM23')
     scope.shuttercontrol = [scope.arclampshutter]
@@ -324,7 +311,7 @@ try:
     camPanels.append((acf, 'Shutter Control'))
 except:
     print 'Error starting arc-lamp shutter ...'
-''')
+""")
 
 InitGUI("""
 from PYME.Acquire.ui import actionUI

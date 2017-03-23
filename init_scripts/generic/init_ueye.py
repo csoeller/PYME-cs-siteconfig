@@ -71,14 +71,14 @@ camPanels.append((sampPan, 'Current Slide'))
 ''')
 
 #setup for the channels to aquire - b/w camera, no shutters
-class chaninfo:
-    names = ['bw']
-    cols = [1] #1 = b/w, 2 = R, 4 = G1, 8 = G2, 16 = B
-    hw = [fakeShutters.CH1] #unimportant - as we have no shutters
-    itimes = [100]
+# class chaninfo:
+#     names = ['bw']
+#     cols = [1] #1 = b/w, 2 = R, 4 = G1, 8 = G2, 16 = B
+#     hw = [fakeShutters.CH1] #unimportant - as we have no shutters
+#     itimes = [100]
 
-scope.chaninfo = chaninfo
-scope.shutters = fakeShutters
+# scope.chaninfo = chaninfo
+# scope.shutters = fakeShutters
 
 
 #PIFoc
