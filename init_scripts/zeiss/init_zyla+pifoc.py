@@ -45,7 +45,7 @@ camPanels.append((scope.camControls['Zyla'], 'Zyla Properties'))
 InitBG('Z Piezo', '''
 from PYME.Acquire.Hardware.Piezos import piezo_e709
 
-scope.piFoc = piezo_e709.piezo_e709T('COM6', 400, 0, True)
+scope.piFoc = piezo_e709.piezo_e709T('COM14', 400, 0, True)
 #scope.hardwareChecks.append(scope._piFoc.OnTarget)
 #scope.CleanupFunctions.append(scope._piFoc.close)
 #scope.piFoc = offsetPiezo.piezoOffsetProxy(scope._piFoc)
