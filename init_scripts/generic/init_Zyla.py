@@ -21,15 +21,13 @@
 #
 ##################
 
-from PYME.Acquire.Hardware.AndorNeo import ZylaControlPanel
-from PYME.Acquire.Hardware.AndorNeo import AndorZyla
 
-from PYME.Acquire.Hardware import fakeShutters
 import time
 
 from PYME.IO import MetaDataHandler
 
 InitBG('Andor Zyla', '''
+from PYME.Acquire.Hardware.AndorNeo import AndorZyla
 scope.cameras['Zyla'] =  AndorZyla.AndorZyla(0)
 scope.cam = scope.cameras['Zyla']
 scope.cameras['Zyla'].Init()
@@ -37,6 +35,7 @@ scope.cameras['Zyla'].SetSimpleGainMode('16-bit (low noise & high well capacity)
 ''')
 
 InitGUI('''
+from PYME.Acquire.Hardware.AndorNeo import ZylaControlPanel
 scope.camControls['Zyla'] = ZylaControlPanel.ZylaControl(MainFrame, scope.cameras['Zyla'], scope)
 camPanels.append((scope.camControls['Zyla'], 'sCMOS Properties'))
 ''')
@@ -48,16 +47,23 @@ MetaDataHandler.provideStartMetadata.append(lambda mdh: sampleInformation.getSam
 camPanels.append((sampPan, 'Current Slide'))
 ''')
 
-#setup for the channels to aquire - b/w camera, no shutters
-class chaninfo:
-    names = ['bw']
-    cols = [1] #1 = b/w, 2 = R, 4 = G1, 8 = G2, 16 = B
-    hw = [fakeShutters.CH1] #unimportant - as we have no shutters
-    itimes = [100]
 
-scope.chaninfo = chaninfo
-scope.shutters = fakeShutters
+# FIXME
+# we may need the below fakeshutter stuff once we want to use protocols which try to open and close shutters!
+# CHECK
 
+# InitGUI('''
+# #setup for the channels to aquire - b/w camera, no shutters
+# from PYME.Acquire.Hardware import fakeShutters
+# class chaninfo:
+#     names = ['bw']
+#     cols = [1] #1 = b/w, 2 = R, 4 = G1, 8 = G2, 16 = B
+#     hw = [fakeShutters.CH1] #unimportant - as we have no shutters
+#     itimes = [100]
+
+# scope.chaninfo = chaninfo
+# scope.shutters = fakeShutters
+# ''')
 
 InitGUI('''
 from PYME.Acquire.Hardware import focusKeys
