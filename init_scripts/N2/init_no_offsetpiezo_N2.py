@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 ##################
-# init_offsetpiezo_N2.py
+# init_no_offsetpiezo_N2.py
 #
 # Copyright David Baddeley, 2009
 # d.baddeley@auckland.ac.nz
@@ -77,20 +77,17 @@ ssp = sarcSpacing.SarcomereChecker(MainFrame, menuBar1, scope)
 
 
 InitBG('Z Piezo', """
-from PYME.Acquire.Hardware.Piezos import piezo_e709, offsetPiezo
+from PYME.Acquire.Hardware.Piezos import piezo_e709
 
-scope._piFoc = piezo_e709.piezo_e709T('COM20', 400, 0, True)
-scope.hardwareChecks.append(scope._piFoc.OnTarget)
-scope.CleanupFunctions.append(scope._piFoc.close)
-scope.piFoc = offsetPiezo.piezoOffsetProxy(scope._piFoc)
+scope.piFoc = piezo_e709.piezo_e709T('COM20', 400, 0, True)
+scope.hardwareChecks.append(scope.piFoc.OnTarget)
+scope.CleanupFunctions.append(scope.piFoc.close)
+
 scope.register_piezo(scope.piFoc, 'z')
 #scope.piezos.append((scope.piFoc, 1, 'PIFoc'))
 #scope.positioning['z'] = (scope.piFoc, 1, 1)
 
-#server so drift correction can connect to the piezo
-pst = offsetPiezo.ServerThread(scope.piFoc)
-pst.start()
-scope.CleanupFunctions.append(pst.cleanup)
+
 
 #scope.state.registerHandler('Positioning.z', lambda : scope.piFoc.GetPos(1), lambda v : scope.piFoc.MoveTo(1, v))
 """)
