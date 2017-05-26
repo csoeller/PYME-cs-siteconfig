@@ -117,8 +117,8 @@ scope.joystick = scope.stage.joystick
 scope.joystick.Enable(True)
 scope.CleanupFunctions.append(scope.stage.Cleanup)
 
-scope.register_piezo(scope.stage, 'x', channel=0)
-scope.register_piezo(scope.stage, 'y', channel=1, multiplier=-1)
+scope.register_piezo(scope.stage, 'x', channel=0, multiplier=1000)
+scope.register_piezo(scope.stage, 'y', channel=1, multiplier=-1000)
 #scope.positioning['x'] = (scope.stage, 0, 1000)
 #scope.positioning['y'] = (scope.stage, 1, -1000)
 
