@@ -138,7 +138,7 @@ time1.WantNotification.append(pv.draw)
 
 InitGUI("""
 from PYME.Acquire.Hardware import splitter
-splt = splitter.Splitter(MainFrame, scope, scope.cameras['Ixon'], flipChan = 0, transLocOnCamera = 'bottom', flip=False, dir='up_down', constrain=False)
+splt = splitter.Splitter(MainFrame, scope, scope.cameras['Ixon'], flipChan = 0, transLocOnCamera = 'bottom', flip=False, dir='up_down', constrain=False, dichroic='T710LPXXR-785R')
 """)
 
 
