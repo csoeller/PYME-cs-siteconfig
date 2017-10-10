@@ -50,9 +50,9 @@ scope.cam = scope.cameras['A - Left']
 
 
 InitGUI("""
-from PYME.Acquire.Hardware.AndorIXon import AndorControlFrame
-scope.camControls['A - Left'] = AndorControlFrame.AndorPanel(MainFrame, scope.cameras['A - Left'], scope)
-camPanels.append((scope.camControls['A - Left'], 'EMCCD A Properties'))
+from PYME.Acquire.Hardware.uc480 import ucCamControlFrame
+scope.camControls['A - Left'] = ucCamControlFrame.ucCamPanel(MainFrame, scope.cameras['A - Left'], scope)
+camPanels.append((scope.camControls['A - Left'], 'UC480 Properties'))
 #
 ##scope.camControls['B - Right'] = AndorControlFrame.AndorPanel(MainFrame, scope.cameras['B - Right'], scope)
 ##camPanels.append((scope.camControls['B - Right'], 'EMCCD B Properties'))
