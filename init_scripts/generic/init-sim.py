@@ -34,23 +34,15 @@ from PYME.IO import MetaDataHandler
 
 pz = InitBG('Fake Piezo(s)', """
 scope.fakePiezo = fakePiezo.FakePiezo(100)
-scope.piezos.append((scope.fakePiezo, 1, 'Fake z-piezo'))
+scope.register_piezo(scope.fakePiezo, 'z', needCamRestart=True)
 
 scope.fakeXPiezo = fakePiezo.FakePiezo(10)
-scope.piezos.append((scope.fakeXPiezo, 1, 'Fake x-piezo'))
+scope.register_piezo(scope.fakeXPiezo, 'x')
 
 scope.fakeYPiezo = fakePiezo.FakePiezo(10)
-scope.piezos.append((scope.fakeYPiezo, 1, 'Fake y-piezo'))
-#time.sleep(5)
-
-scope.positioning['x'] = (scope.fakeXPiezo, 1, 1)
-scope.positioning['y'] = (scope.fakeYPiezo, 1, 1)
-scope.positioning['z'] = (scope.fakePiezo, 1, 1)
-
-scope.state.registerHandler('Positioning.x', lambda : scope.fakeXPiezo.GetPos(1), lambda v : scope.fakeXPiezo.MoveTo(1, v))
-scope.state.registerHandler('Positioning.y', lambda : scope.fakeYPiezo.GetPos(1), lambda v : scope.fakeYPiezo.MoveTo(1, v))
-scope.state.registerHandler('Positioning.z', lambda : scope.fakePiezo.GetPos(1), lambda v : scope.fakePiezo.MoveTo(1, v), needCamRestart=True)
+scope.register_piezo(scope.fakeYPiezo, 'y')
 """)
+
 
 pz.join() #piezo must be there before we start camera
 cm = InitBG('Fake Camera', """
