@@ -1,10 +1,12 @@
 #!/usr/bin/python
 
 ##################
-# init_TIRF.py
+# init_ui306x.py
 #
 # Copyright David Baddeley, 2009
 # d.baddeley@auckland.ac.nz
+# 
+# Copyright Christian Soeller, 2017
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -29,21 +31,22 @@ import time
 
 @init_hardware('UEye Camera')
 def ueye_cam(scope):
+    import logging
     from PYME.Acquire.Hardware.uc480 import uCam480
 
     uCam480.init(cameratype='ueye')
     cl = uCam480.GetCameraList()
 
     if cl['count'] <= 0:
-        raise RunTimeError('no cameras')
+        raise RuntimeError('no suitable camera found')
 
     id = -1
     for cam in range(cl['count']):
         if cl['cameras'][cam]['model'].startswith('UI306x'):
             id = cl['cameras'][cam]['ID']
-            print 'ID is %d' % id
+            logging.info('found model %s with ID %d' % (cl['cameras'][cam]['model'],id))
 
-    cam = uCam480.uc480Camera(0,nbits=12)
+    cam = uCam480.uc480Camera(id,nbits=12)
     # cam.port = 
     scope.register_camera(cam, 'UEye')
 
