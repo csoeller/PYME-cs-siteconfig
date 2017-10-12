@@ -107,7 +107,7 @@ scope.hardwareChecks.append(scope.xystage.OnTarget)
 scope.CleanupFunctions.append(scope.xystage.close)
 
 scope.register_piezo(scope.xystage, 'x', channel=1)
-scope.register_piezo(scope.xystage, 'y', channel=2, multiplier=-1)
+scope.register_piezo(scope.xystage, 'y', channel=2, multiplier=1)
 #scope.positioning['x'] = (scope.xystage, 1, 1000)
 #scope.positioning['y'] = (scope.xystage, 2, -1000)
 
@@ -165,8 +165,8 @@ time1.WantNotification.append(fk.refresh)
 
 InitGUI("""
 from PYME.Acquire.Hardware import focusKeys
-Posk = focusKeys.PositionKeys(MainFrame, menuBar1, scope.piezos[1], scope.piezos[2], scope=scope)
-#time1.WantNotification.append(fk.refresh)
+Posk = focusKeys.PositionKeys(MainFrame, scope.piezos[1], scope.piezos[2], scope=scope)
+time1.WantNotification.append(fk.refresh)
 """)
 
 
@@ -217,17 +217,20 @@ except:
 
 from PYME.Acquire.Hardware import lasers
 sb = lasers.SBox(com_port='COM6')
-scope.l671 = lasers.SerialSwitchedLaser('671',sb,0)
-scope.l532 = lasers.SerialSwitchedLaser('532',sb,2)
+scope.l671 = lasers.SerialSwitchedLaser('l671',sb,0,scopeState = scope.state)
+scope.l532 = lasers.SerialSwitchedLaser('l532',sb,2,scopeState = scope.state)
 
 from PYME.Acquire.Hardware import matchboxLaser
-scope.l405 = matchboxLaser.MatchboxLaser('405',portname='COM5')
+scope.l405 = matchboxLaser.MatchboxLaser('l405',portname='COM5',scopeState = scope.state)
 
 from PYME.Acquire.Hardware import phoxxLaserOLD
-scope.l647 = phoxxLaserOLD.PhoxxLaser('647',portname='COM15')
+scope.l647 = phoxxLaserOLD.PhoxxLaser('l647',portname='COM15',scopeState = scope.state)
 scope.StatusCallbacks.append(scope.l647.GetStatusText)
 
-scope.lasers = [scope.l671, scope.l405, scope.l647, scope.l532]
+from PYME.Acquire.Hardware import cobaltLaser
+scope.l488 = cobaltLaser.CobaltLaser('l488',portname='COM9',minpower=0.001, maxpower=0.2,scopeState = scope.state)
+
+scope.lasers = [scope.l671, scope.l405, scope.l647, scope.l532, scope.l488]
 
 
 InitGUI("""
@@ -246,7 +249,26 @@ if 'lasers'in dir(scope):
     camPanels.append((lcf, 'Laser Control'))
 """)
 
+InitBG('DMD', """
+from PYME.Acquire.Hardware import TiLightCrafter
 
+scope.LC = TiLightCrafter.LightCrafter()
+scope.LC.Connect()
+scope.LC.SetDisplayMode(scope.LC.DISPLAY_MODE.DISP_MODE_IMAGE)
+scope.LC.SetStatic(255)
+""")
+
+InitGUI("""
+from PYME.Acquire.Hardware import DMDGui
+DMDModeSelectionPanel = DMDGui.DMDModeChooserPanel(MainFrame, scope)
+DMDtpPanel = DMDGui.DMDTestPattern(MainFrame, scope.LC)
+DMDsiPanel = DMDGui.DMDStaticImage(MainFrame, scope.LC)
+DMDseqPanel = DMDGui.DMDImageSeq(MainFrame, scope.LC)
+camPanels.append((DMDModeSelectionPanel, 'select DMD Mode'))
+camPanels.append((DMDtpPanel, 'select test pattern'))
+camPanels.append((DMDsiPanel, 'select static image'))
+camPanels.append((DMDseqPanel, 'select image sequence'))
+""")
 
 
 InitGUI("""

@@ -63,7 +63,8 @@ camPanels.append((scope.camControls['A - Left'], 'EMCCD A Properties'))
 InitBG('PIFoc', """
 from PYME.Acquire.Hardware.Piezos import offsetPiezo
 scope.piFoc = offsetPiezo.getClient('PHY-LMIC1')# piezo_e816.piezo_e816('COM1', 400, 0, True)
-scope.piezos.append((scope.piFoc, 1, 'PIFoc'))
+scope.register_piezo(scope.piFoc, 'z')
+#scope.piezos.append((scope.piFoc, 1, 'PIFoc'))
 """)
 
 InitGUI("""
