@@ -55,7 +55,7 @@ def sample_db(MainFrame,scope):
 def init_zpiezo(scope):
     from PYME.Acquire.Hardware.Piezos import piezo_e709, offsetPiezo
 
-    scope._piFoc = piezo_e709.print()iezo_e709T('COM20', 400, 0, True)
+    scope._piFoc = piezo_e709.piezo_e709T('COM20', 400, 0, True)
     scope.hardwareChecks.append(scope._piFoc.OnTarget)
     scope.CleanupFunctions.append(scope._piFoc.close)
     scope.piFoc = offsetPiezo.piezoOffsetProxy(scope._piFoc)
@@ -113,8 +113,8 @@ def nikon_stand(MainFrame,scope):
     MetaDataHandler.provideStartMetadata.append(scope.lightpath.ProvideMetadata)
 
 
-@init_hardware('spacenav')
-def ini_spacenav(scope):
+@init_gui('spacenav')
+def ini_spacenav(MainFrame,scope):
     from PYME.Acquire.Hardware import spacenav
     scope.spacenav = spacenav.SpaceNavigator()
     scope.CleanupFunctions.append(scope.spacenav.close)
@@ -217,7 +217,7 @@ def laser_ctr2(MainFrame, scope):
         MainFrame.time1.WantNotification.append(lcf.refresh)
         MainFrame.camPanels.append((lcf, 'Laser Control'))
 
-# we get errors if this is not present ?
+# do we get errors if this is not present ?
 @init_hardware('DMD')
 def dmd(scope):
     from PYME.Acquire.Hardware import TiLightCrafter
@@ -227,7 +227,7 @@ def dmd(scope):
     scope.LC.SetDisplayMode(scope.LC.DISPLAY_MODE.DISP_MODE_IMAGE)
     scope.LC.SetStatic(255)
 
-# we get errors if this is not present ?
+# do we get errors if this is not present ?
 @init_gui('DMDGui')
 def dmd_gui(MainFrame, scope):
     from PYME.Acquire.Hardware import DMDGui
@@ -241,7 +241,7 @@ def dmd_gui(MainFrame, scope):
     MainFrame.camPanels.append((DMDseqPanel, 'select image sequence'))
 
 
-@init_gui('Arclamp'):
+@init_gui('Arclamp')
 def arclamp(MainFrame, scope):
     from PYME.Acquire.Hardware import priorLumen, arclampshutterpanel
     try:
@@ -254,7 +254,7 @@ def arclamp(MainFrame, scope):
         print 'Error starting arc-lamp shutter ...'
 
 
-@init_gui('Action Panel'):
+@init_gui('Action Panel')
 def action_panel(MainFrame, scope):
     from PYME.Acquire.ui import actionUI
 
@@ -262,7 +262,7 @@ def action_panel(MainFrame, scope):
     MainFrame.AddPage(ap, caption='Queued Actions')
 
 
-@init_gui('Analysis Settings'):
+@init_gui('Analysis Settings')
 def analysis_settings(MainFrame, scope):
     from PYME.Acquire.ui import AnalysisSettingsUI
     AnalysisSettingsUI.Plug(scope, MainFrame)
@@ -272,5 +272,5 @@ def analysis_settings(MainFrame, scope):
 joinBGInit() #wait for anyhting which was being done in a separate thread
 
 
-time.sleep(.5) # this should not be necessary anymore
+# time.sleep(.5) # this should not be necessary anymore
 scope.initDone = True
