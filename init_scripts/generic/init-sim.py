@@ -151,7 +151,7 @@ camPanels.append((lsf, 'Laser Powers'))
 
 InitGUI("""
 from PYME.Acquire.Hardware import focusKeys
-fk = focusKeys.FocusKeys(MainFrame, None, scope.piezos[0])
+fk = focusKeys.FocusKeys(MainFrame, scope.piezos[0])
 #time1.WantNotification.append(fk.refresh)
 """)
 
@@ -163,9 +163,9 @@ fk = focusKeys.FocusKeys(MainFrame, None, scope.piezos[0])
 InitGUI("""
 from PYME.Acquire.ui import actionUI
 
-ap = actionUI.ActionPanel(MainFrame, scope.actions)
+ap = actionUI.ActionPanel(MainFrame, scope.actions,scope)
 MainFrame.AddPage(ap, caption='Queued Actions')
-""")
+""",'action ui')
 
 #must be here!!!
 joinBGInit() #wait for anyhting which was being done in a separate thread
