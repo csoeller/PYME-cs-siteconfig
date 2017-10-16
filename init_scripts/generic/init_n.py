@@ -103,10 +103,16 @@ def laser_controls(MainFrame, scope):
     MainFrame.time1.WantNotification.append(lsf.update)
     MainFrame.camPanels.append((lsf, 'Laser Powers'))
 
-# @init_gui('Focus Keys')
-# def focus_keys(MainFrame, scope):
-#     from PYME.Acquire.Hardware import focusKeys
-#     fk = focusKeys.FocusKeys(MainFrame, None, scope.piezos[0])
+@init_gui('Focus Keys')
+def focus_keys(MainFrame, scope):
+    from PYME.Acquire.Hardware import focusKeys
+    fk = focusKeys.FocusKeys(MainFrame, scope.piezos[0])
+    MainFrame.time1.WantNotification.append(fk.refresh)
+
+@init_gui('Focus Keys xy')
+def focus_keys_xy(MainFrame,scope):
+    from PYME.Acquire.Hardware import focusKeys
+    Posk = focusKeys.PositionKeys(MainFrame, scope.piezos[1], scope.piezos[2], scope=scope)
 
 @init_gui('Action manager')
 def action_manager(MainFrame, scope):
