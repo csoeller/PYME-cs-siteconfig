@@ -27,6 +27,7 @@ from PYME.Acquire.ExecTools import joinBGInit, HWNotPresent, init_gui, init_hard
 
 import time
         
+# we need to get a way to get the camera ID into the InitBG call
 def findcamID_startswith(modelname):
     if cl['count'] <= 0:
         raise RuntimeError('no suitable camera found')
@@ -39,25 +40,44 @@ def findcamID_startswith(modelname):
 
     return None
 
-@init_hardware('UEye Camera')
+
+@init_hardware('UEye Cameras')
 def ueye_cam(scope):
     import logging
     import pprint
     from PYME.Acquire.Hardware.uc480 import uCam480
 
     uCam480.init(cameratype='ueye')
+    print uCam480.GetCameraList()
     cl = uCam480.GetCameraList()
     pprint.pprint(cl)
 
-    cam = uCam480.uc480Camera(findcamID_startswith('UI306x'),nbits=12, isDeviceID=True)
+    cam = uCam480.uc480Camera(findcamID_startswith('UI324x'),
+                              nbits=12, isDeviceID=True)
+    cam.SetActive(False)
     # cam.port = 
-    scope.register_camera(cam, 'UEye')
+    scope.register_camera(cam, 'UEye UI324x')
+
+    cam = uCam480.uc480Camera(findcamID_startswith('UI306x'),
+                              nbits=12, isDeviceID=True)
+    cam.SetActive(True)
+    # cam.port = 
+    scope.register_camera(cam, 'UEye UI306x')
+    scope.cam = cam # make this one the startup cam
+    
 
 @init_gui('Camera controls')
 def cam_control(MainFrame, scope):
     from PYME.Acquire.Hardware.uc480 import ucCamControlFrame
-    scope.camControls['UEye'] = ucCamControlFrame.ucCamPanel(MainFrame, scope.cameras['UEye'], scope)
-    MainFrame.camPanels.append((scope.camControls['UEye'], 'UEye Properties'))
+    scope.camControls['UEye UI306x'] = ucCamControlFrame.ucCamPanel(MainFrame,
+                                                                     scope.cameras['UEye UI306x'],
+                                                                     scope)
+    MainFrame.camPanels.append((scope.camControls['UEye UI306x'], 'UI306x Properties'))
+
+    scope.camControls['UEye UI324x'] = ucCamControlFrame.ucCamPanel(MainFrame,
+                                                                     scope.cameras['UEye UI324x'],
+                                                                     scope)
+    MainFrame.camPanels.append((scope.camControls['UEye UI324x'], 'UI324x Properties'))
 
 scope.lasers = [] # we need that for most protocols
 
