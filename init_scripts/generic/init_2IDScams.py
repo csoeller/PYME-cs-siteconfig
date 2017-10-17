@@ -26,26 +26,24 @@
 from PYME.Acquire.ExecTools import joinBGInit, HWNotPresent, init_gui, init_hardware
 
 import time
-        
-# we need to get a way to get the camera ID into the InitBG call
-def findcamID_startswith(modelname):
-    if cl['count'] <= 0:
-        raise RuntimeError('no suitable camera found')
-
-    for cam in range(cl['count']):
-        if cl['cameras'][cam]['model'].startswith(modelname):
-            id = cl['cameras'][cam]['DeviceID']
-            logging.info('found model %s with ID %d' % (cl['cameras'][cam]['model'],id))
-            return id
-
-    return None
-
 
 @init_hardware('UEye Cameras')
 def ueye_cam(scope):
     import logging
     import pprint
     from PYME.Acquire.Hardware.uc480 import uCam480
+
+    def findcamID_startswith(modelname):
+        if cl['count'] <= 0:
+            raise RuntimeError('no suitable camera found')
+
+        for cam in range(cl['count']):
+            if cl['cameras'][cam]['model'].startswith(modelname):
+                id = cl['cameras'][cam]['DeviceID']
+                logging.info('found model %s with ID %d' % (cl['cameras'][cam]['model'],id))
+                return id
+
+        return None
 
     uCam480.init(cameratype='ueye')
     print uCam480.GetCameraList()
@@ -54,18 +52,15 @@ def ueye_cam(scope):
 
     cam = uCam480.uc480Camera(findcamID_startswith('UI324x'),
                               nbits=12, isDeviceID=True)
-    cam.SetActive(False)
-    # cam.port = 
     scope.register_camera(cam, 'UEye UI324x')
 
     cam = uCam480.uc480Camera(findcamID_startswith('UI306x'),
                               nbits=12, isDeviceID=True)
-    cam.SetActive(True)
-    # cam.port = 
     scope.register_camera(cam, 'UEye UI306x')
     scope.cam = cam # make this one the startup cam
     
 
+# note: without camControls for both cams we have an issue when switching!
 @init_gui('Camera controls')
 def cam_control(MainFrame, scope):
     from PYME.Acquire.Hardware.uc480 import ucCamControlFrame

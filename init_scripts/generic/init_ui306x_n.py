@@ -27,30 +27,29 @@ from PYME.Acquire.ExecTools import joinBGInit, HWNotPresent, init_gui, init_hard
 
 import time
         
-def findcamID_startswith(modelname):
-    if cl['count'] <= 0:
-        raise RuntimeError('no suitable camera found')
-
-    for cam in range(cl['count']):
-        if cl['cameras'][cam]['model'].startswith(modelname):
-            id = cl['cameras'][cam]['DeviceID']
-            logging.info('found model %s with ID %d' % (cl['cameras'][cam]['model'],id))
-            return id
-
-    return None
-
 @init_hardware('UEye Camera')
 def ueye_cam(scope):
     import logging
     import pprint
     from PYME.Acquire.Hardware.uc480 import uCam480
 
+    def findcamID_startswith(modelname):
+        if cl['count'] <= 0:
+            raise RuntimeError('no suitable camera found')
+
+        for cam in range(cl['count']):
+            if cl['cameras'][cam]['model'].startswith(modelname):
+                id = cl['cameras'][cam]['DeviceID']
+                logging.info('found model %s with ID %d' % (cl['cameras'][cam]['model'],id))
+                return id
+
+        return None
+
     uCam480.init(cameratype='ueye')
     cl = uCam480.GetCameraList()
     pprint.pprint(cl)
 
     cam = uCam480.uc480Camera(findcamID_startswith('UI306x'),nbits=12, isDeviceID=True)
-    # cam.port = 
     scope.register_camera(cam, 'UEye')
 
 @init_gui('Camera controls')
