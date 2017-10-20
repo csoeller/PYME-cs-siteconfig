@@ -9,7 +9,7 @@ build\*
 build/*
 */_build/*
 */dist/*
-dist\*
+dist*
 *_hidden*
 *.so
 *.o
