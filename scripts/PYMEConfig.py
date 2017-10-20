@@ -22,6 +22,7 @@ def list_config_dirs():
 def main():
     import sys
     import argparse
+    import pprint
 
     # options parsing
     op = argparse.ArgumentParser(description='inspect PYME config files and settings.')
@@ -31,6 +32,8 @@ def main():
                     help='print configuration parameters', dest='config_params')
     op.add_argument('-d','--directories', action='store_true',
                     help='print configuration directories')
+    op.add_argument('--protocols', action='store_true',
+                    help='print custom protols found')
 
     args = op.parse_args()
 
@@ -48,6 +51,12 @@ def main():
         print('List of configuration parameters:')
         for par in config.config.keys():
             print('%s : %s' % (par,config.config[par]))
+        sys.exit(0)
+
+    if args.protocols:
+        prots = config.get_custom_protocols()
+        print('Custom Protocols:')
+        pprint.pprint(prots)
         sys.exit(0)
 
     # if we got here carry out a default action
