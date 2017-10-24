@@ -9,7 +9,7 @@ build\*
 build/*
 */_build/*
 */dist/*
-dist\*
+dist*
 *_hidden*
 *.so
 *.o
@@ -27,3 +27,4 @@ patches/*
 *Pyro_NS_URI
 *.sqlite3
 *\#*\#
+init_scripts/generic/init_UOA_n.py
