@@ -1,12 +1,10 @@
 #!/usr/bin/python
 
 ##################
-# init_ui306x.py
+# init_rev_N2.py
 #
 # Copyright David Baddeley, 2009
 # d.baddeley@auckland.ac.nz
-# 
-# Copyright Christian Soeller, 2017
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -25,8 +23,6 @@
 
 from PYME.Acquire.ExecTools import joinBGInit, HWNotPresent, init_gui, init_hardware
 
-import time
-        
 @init_hardware('UEye Camera')
 def ueye_cam(scope):
     import logging
@@ -49,9 +45,10 @@ def ueye_cam(scope):
     cl = uCam480.GetCameraList()
     pprint.pprint(cl)
 
-    cam = uCam480.uc480Camera(findcamID_startswith('UI306x'),nbits=12, isDeviceID=True)
+    cam = uCam480.uc480Camera(findcamID_startswith('UI324x'),nbits=12, isDeviceID=True)
     cam.SetGain(50)
     scope.register_camera(cam, 'UEye')
+
 
 @init_gui('Camera controls')
 def cam_control(MainFrame, scope):
@@ -59,16 +56,27 @@ def cam_control(MainFrame, scope):
     scope.camControls['UEye'] = ucCamControlFrame.ucCamPanel(MainFrame, scope.cameras['UEye'], scope)
     MainFrame.camPanels.append((scope.camControls['UEye'], 'UEye Properties'))
 
-scope.lasers = [] # we need that for most protocols
 
-@init_gui('Sample database')
-def samp_db(MainFrame, scope):
-    from PYME.Acquire import sampleInformation
-    sampPan = sampleInformation.slidePanel(MainFrame)
-    MainFrame.camPanels.append((sampPan, 'Current Slide'))
+@init_hardware('Z Piezo')
+def init_zpiezo(scope):
+    from PYME.Acquire.Hardware.Piezos import offsetPiezo
+    scope.piFoc = offsetPiezo.getClient('PHY-LMIC1')
+    scope.register_piezo(scope.piFoc, 'z')
+
+
+@init_gui('Drift tracking')
+def init_driftTracking(MainFrame,scope):
+    from PYME.Acquire.Hardware import driftTracking, driftTrackGUI
+    scope.dt = driftTracking.correlator(scope, scope.piFoc)
+    dtp = driftTrackGUI.DriftTrackingControl(MainFrame, scope.dt)
+    MainFrame.camPanels.append((dtp, 'Focus Lock'))
+    MainFrame.time1.WantNotification.append(dtp.refresh)
+
 
 
 #must be here!!!
 joinBGInit() #wait for anyhting which was being done in a separate thread
 
 scope.initDone = True
+
+

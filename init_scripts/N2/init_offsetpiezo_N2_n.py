@@ -103,7 +103,7 @@ def nikon_stand(MainFrame,scope):
     scope.dichroic = NikonTi.FilterChanger()
     scope.lightpath = NikonTi.LightPath()
 
-    TiPanel = NikonTiGUI.TiPanel(MainFrame, selfcope.dichroic, scope.lightpath)
+    TiPanel = NikonTiGUI.TiPanel(MainFrame, scope.dichroic, scope.lightpath)
     MainFrame.toolPanels.append((TiPanel, 'Nikon Ti'))
 
     MainFrame.time1.WantNotification.append(scope.dichroic.Poll)
