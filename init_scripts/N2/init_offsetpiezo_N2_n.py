@@ -33,7 +33,7 @@ def init_zyla(scope):
     cam.DefaultEMGain = 0 #hack to make camera work with standard protocols
     #cam.SetSimpleGainMode('16-bit (low noise & high well capacity)')
     
-    scope.register_camera(cam, 'Zyla')
+    scope.register_camera(cam, 'Zyla', 'R100')
 
 
 @init_gui('Zyla Controls')
@@ -41,6 +41,41 @@ def zyla_controls(MainFrame,scope):
     from PYME.Acquire.Hardware.AndorNeo import ZylaControlPanel
     scope.camControls['Zyla'] = ZylaControlPanel.ZylaControl(MainFrame, scope.cameras['Zyla'], scope)
     MainFrame.camPanels.append((scope.camControls['Zyla'], 'sCMOS Properties'))
+
+
+@init_hardware('UEye Camera')
+def ueye_cam(scope):
+    import logging
+    import pprint
+    from PYME.Acquire.Hardware.uc480 import uCam480
+
+    def findcamID_startswith(modelname):
+        if cl['count'] <= 0:
+            raise RuntimeError('no suitable camera found')
+
+        for cam in range(cl['count']):
+            if cl['cameras'][cam]['model'].startswith(modelname):
+                id = cl['cameras'][cam]['DeviceID']
+                logging.info('found model %s with ID %d' % (cl['cameras'][cam]['model'],id))
+                return id
+
+        return None
+
+    uCam480.init(cameratype='ueye')
+    cl = uCam480.GetCameraList()
+    pprint.pprint(cl)
+
+    cam = uCam480.uc480Camera(findcamID_startswith('UI306x'),nbits=12, isDeviceID=True)
+    cam.SetGain(50)
+    cam.port = 'L100'
+    scope.register_camera(cam, 'UEye', 'L100')
+
+
+@init_gui('Camera controls')
+def cam_control(MainFrame, scope):
+    from PYME.Acquire.Hardware.uc480 import ucCamControlFrame
+    scope.camControls['UEye'] = ucCamControlFrame.ucCamPanel(MainFrame, scope.cameras['UEye'], scope)
+    MainFrame.camPanels.append((scope.camControls['UEye'], 'UEye Properties'))
 
 
 @init_gui('sample database')
