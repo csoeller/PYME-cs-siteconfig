@@ -34,6 +34,7 @@ def init_zyla(scope):
     #cam.SetSimpleGainMode('16-bit (low noise & high well capacity)')
     
     scope.register_camera(cam, 'Zyla', 'R100')
+    scope.cam = cam # make the camera connected to the splitter as the startup cam. 
 
 
 @init_gui('Zyla Controls')
