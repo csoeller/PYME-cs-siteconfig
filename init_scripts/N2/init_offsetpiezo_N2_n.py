@@ -129,7 +129,7 @@ def postracker(MainFrame,scope):
 @init_gui('splitter')
 def ini_splitter(MainFrame,scope):
     from PYME.Acquire.Hardware import splitter
-    splt = splitter.Splitter(MainFrame, scope, scope.cam, flipChan = 0,
+    splt = splitter.Splitter(MainFrame, scope, scope.cameras['Zyla'], flipChan = 0,
                              transLocOnCamera = 'Left', flip=False, dir='left_right', constrain=False)
 
 
