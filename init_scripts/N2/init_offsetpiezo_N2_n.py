@@ -220,8 +220,8 @@ def lasers(scope):
     sb = lasers.SBox(com_port='COM6')
     scope.l671 = lasers.SerialSwitchedLaser('l671',sb,0,scopeState = scope.state)
     scope.l671.register(scope)
-    scope.l532 = lasers.SerialSwitchedLaser('l532',sb,2,scopeState = scope.state)
-    scope.l532.register(scope)
+    #scope.l532 = lasers.SerialSwitchedLaser('l532',sb,2,scopeState = scope.state)
+    #scope.l532.register(scope)
     
     from PYME.Acquire.Hardware import matchboxLaser
     scope.l405 = matchboxLaser.MatchboxLaser('l405',portname='COM5',scopeState = scope.state)
@@ -233,6 +233,8 @@ def lasers(scope):
     scope.l647.register(scope)
     
     from PYME.Acquire.Hardware import cobaltLaser
+    scope.l561 = cobaltLaser.CobaltLaser('l561',portname='COM10',minpower=0.1, maxpower=0.2,scopeState = scope.state)
+    scope.l561.register(scope)
     scope.l488 = cobaltLaser.CobaltLaser('l488',portname='COM9',minpower=0.001, maxpower=0.2,scopeState = scope.state)
     scope.l488.register(scope)
 
@@ -254,28 +256,29 @@ def laser_ctr2(MainFrame, scope):
         MainFrame.time1.WantNotification.append(lcf.refresh)
         MainFrame.camPanels.append((lcf, 'Laser Control'))
 
+#temporarily take the DMD module out. For now we use the manufacturer's software to control the DMD - Ruisheng
 # do we get errors if this is not present ?
-@init_hardware('DMD')
-def dmd(scope):
-    from PYME.Acquire.Hardware import TiLightCrafter
+# @init_hardware('DMD')
+# def dmd(scope):
+#     from PYME.Acquire.Hardware import TiLightCrafter
 
-    scope.LC = TiLightCrafter.LightCrafter()
-    scope.LC.Connect()
-    scope.LC.SetDisplayMode(scope.LC.DISPLAY_MODE.DISP_MODE_IMAGE)
-    scope.LC.SetStatic(255)
+#     scope.LC = TiLightCrafter.LightCrafter()
+#     scope.LC.Connect()
+#     scope.LC.SetDisplayMode(scope.LC.DISPLAY_MODE.DISP_MODE_IMAGE)
+#     scope.LC.SetStatic(255)
 
-# do we get errors if this is not present ?
-@init_gui('DMDGui')
-def dmd_gui(MainFrame, scope):
-    from PYME.Acquire.Hardware import DMDGui
-    DMDModeSelectionPanel = DMDGui.DMDModeChooserPanel(MainFrame, scope)
-    DMDtpPanel = DMDGui.DMDTestPattern(MainFrame, scope.LC)
-    DMDsiPanel = DMDGui.DMDStaticImage(MainFrame, scope.LC)
-    DMDseqPanel = DMDGui.DMDImageSeq(MainFrame, scope.LC)
-    MainFrame.camPanels.append((DMDModeSelectionPanel, 'select DMD Mode'))
-    MainFrame.camPanels.append((DMDtpPanel, 'select test pattern'))
-    MainFrame.camPanels.append((DMDsiPanel, 'select static image'))
-    MainFrame.camPanels.append((DMDseqPanel, 'select image sequence'))
+# # do we get errors if this is not present ?
+# @init_gui('DMDGui')
+# def dmd_gui(MainFrame, scope):
+#     from PYME.Acquire.Hardware import DMDGui
+#     DMDModeSelectionPanel = DMDGui.DMDModeChooserPanel(MainFrame, scope)
+#     DMDtpPanel = DMDGui.DMDTestPattern(MainFrame, scope.LC)
+#     DMDsiPanel = DMDGui.DMDStaticImage(MainFrame, scope.LC)
+#     DMDseqPanel = DMDGui.DMDImageSeq(MainFrame, scope.LC)
+#     MainFrame.camPanels.append((DMDModeSelectionPanel, 'select DMD Mode'))
+#     MainFrame.camPanels.append((DMDtpPanel, 'select test pattern'))
+#     MainFrame.camPanels.append((DMDsiPanel, 'select static image'))
+#     MainFrame.camPanels.append((DMDseqPanel, 'select image sequence'))
 
 
 @init_gui('Arclamp')
