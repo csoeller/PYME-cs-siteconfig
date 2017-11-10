@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 ##################
-# init_offsetpiezo_N2.py
+# init_cubicle_PHY_AMG.py
 #
 # Copyright David Baddeley, 2009
 # d.baddeley@auckland.ac.nz
@@ -44,39 +44,21 @@ def zyla_controls(MainFrame,scope):
     MainFrame.camPanels.append((scope.camControls['Zyla'], 'sCMOS Properties'))
 
 
-@init_hardware('UEye Camera')
-def ueye_cam(scope):
-    import logging
-    import pprint
-    from PYME.Acquire.Hardware.uc480 import uCam480
-
-    def findcamID_startswith(modelname):
-        if cl['count'] <= 0:
-            raise RuntimeError('no suitable camera found')
-
-        for cam in range(cl['count']):
-            if cl['cameras'][cam]['model'].startswith(modelname):
-                id = cl['cameras'][cam]['DeviceID']
-                logging.info('found model %s with ID %d' % (cl['cameras'][cam]['model'],id))
-                return id
-
-        return None
-
-    uCam480.init(cameratype='ueye')
-    cl = uCam480.GetCameraList()
-    pprint.pprint(cl)
-
-    cam = uCam480.uc480Camera(findcamID_startswith('UI306x'),nbits=12, isDeviceID=True)
-    cam.SetGain(50)
+@init_hardware('Andor Ixon')
+def init_ixon(scope):
+    from PYME.Acquire.Hardware.AndorIXon import AndorIXon
+    cam = AndorIXon.iXonCamera(0)
+    cam.SetShutter(False)
+    cam.SetActive(False)
     cam.port = 'L100'
-    scope.register_camera(cam, 'UEye', 'L100')
+    scope.register_camera(cam, 'Ixon', 'L100')
 
 
-@init_gui('Camera controls')
-def cam_control(MainFrame, scope):
-    from PYME.Acquire.Hardware.uc480 import ucCamControlFrame
-    scope.camControls['UEye'] = ucCamControlFrame.ucCamPanel(MainFrame, scope.cameras['UEye'], scope)
-    MainFrame.camPanels.append((scope.camControls['UEye'], 'UEye Properties'))
+@init_gui('Ixon Controls')
+def ixon_controls(MainFrame,scope):
+    from PYME.Acquire.Hardware.AndorIXon import AndorControlFrame
+    scope.camControls['Ixon'] = AndorControlFrame.AndorPanel(MainFrame, scope.cameras['Ixon'], scope)
+    MainFrame.camPanels.append((scope.camControls['Ixon'], 'EMCCD Properties'))
 
 
 @init_gui('sample database')
@@ -90,11 +72,9 @@ def sample_db(MainFrame,scope):
 
 @init_hardware('Z Piezo')
 def init_zpiezo(scope):
-    from PYME.Acquire.Hardware.Piezos import piezo_e709, offsetPiezo
+    from PYME.Acquire.Hardware.Piezos import piezo_e816, offsetPiezo
 
-    scope._piFoc = piezo_e709.piezo_e709T('COM20', 400, 0, True)
-    scope.hardwareChecks.append(scope._piFoc.OnTarget)
-    scope.CleanupFunctions.append(scope._piFoc.close)
+    scope._piFoc = piezo_e816.piezo_e816('COM22', 400, 0, False)
     scope.piFoc = offsetPiezo.piezoOffsetProxy(scope._piFoc)
     scope.register_piezo(scope.piFoc, 'z') # David's code has an extra ...,needCamRestart=True)
 
@@ -106,15 +86,16 @@ def init_zpiezo(scope):
 
 @init_hardware('XY Stage')
 def init_xy(scope):
-    from PYME.Acquire.Hardware.Piezos import piezo_c867
-    scope.xystage = piezo_c867.piezo_c867T('COM16')
-    scope.joystick = piezo_c867.c867Joystick(scope.xystage)
-    #scope.joystick.Enable(True)
-    scope.hardwareChecks.append(scope.xystage.OnTarget)
-    scope.CleanupFunctions.append(scope.xystage.close)
+    from PYME.Acquire.Hardware.Mercury import mercuryStepper
+    scope.stage = mercuryStepper.mercuryStepper(comPort=21, baud=38400, axes=['A', 'B'], steppers=['M-229.25S', 'M-229.25S'])
+    scope.stage.SetSoftLimits(0, [1.06, 20.7])
+    scope.stage.SetSoftLimits(1, [.8, 17.6])
+    scope.joystick = scope.stage.joystick
+    scope.joystick.Enable(True)
+    scope.CleanupFunctions.append(scope.stage.Cleanup)
 
-    scope.register_piezo(scope.xystage, 'x', channel=1) # David's code has an extra ...,needCamRestart=True)
-    scope.register_piezo(scope.xystage, 'y', channel=2, multiplier=1) # David's code has an extra ...,needCamRestart=True)
+    scope.register_piezo(scope.stage, 'x', channel=0, multiplier=1000)
+    scope.register_piezo(scope.stage, 'y', channel=1, multiplier=-1000)
 
 
 @init_gui('tracker')
@@ -129,8 +110,8 @@ def postracker(MainFrame,scope):
 @init_gui('splitter')
 def ini_splitter(MainFrame,scope):
     from PYME.Acquire.Hardware import splitter
-    splt = splitter.Splitter(MainFrame, scope, scope.cameras['Zyla'], flipChan = 0,
-                             transLocOnCamera = 'Left', flip=False, dir='left_right', constrain=False)
+    splt = splitter.Splitter(MainFrame, scope, scope.cameras['Ixon'], flipChan = 0,
+                             transLocOnCamera = 'bottom', flip=False, dir='up_down', constrain=False, dichroic='T710LPXXR-785R')
 
 
 @init_gui('Nikon Stand')
@@ -148,14 +129,6 @@ def nikon_stand(MainFrame,scope):
 
     MetaDataHandler.provideStartMetadata.append(scope.dichroic.ProvideMetadata)
     MetaDataHandler.provideStartMetadata.append(scope.lightpath.ProvideMetadata)
-
-
-@init_gui('spacenav')
-def ini_spacenav(MainFrame,scope):
-    from PYME.Acquire.Hardware import spacenav
-    scope.spacenav = spacenav.SpaceNavigator()
-    scope.CleanupFunctions.append(scope.spacenav.close)
-    scope.ctrl3d = spacenav.SpaceNavPiezoCtrl(scope.spacenav, scope.piFoc, scope.xystage)
 
 
 @init_gui('Focus Keys z')
@@ -181,7 +154,7 @@ def filter_wheel(MainFrame,scope):
                 WFilter(5, 'ND3'  , 'UVND 3'  , 3),
                 WFilter(6, 'ND4'  , 'UVND 4'  , 4)]
     try:
-        scope.filterWheel = FiltWheel(filtList, 'COM21')
+        scope.filterWheel = FiltWheel(filtList, 'COM18')
         #scope.filterWheel.SetFilterPos("LF488")
         scope.filtPan = FiltFrame(MainFrame, scope.filterWheel)
         MainFrame.toolPanels.append((scope.filtPan, 'Filter Wheel'))
@@ -192,21 +165,22 @@ def filter_wheel(MainFrame,scope):
 @init_gui('Exciter Wheel')
 def exciter_wheel(MainFrame,scope):
     from PYME.Acquire.Hardware import ExciterWheel
-    exciterList = [ExciterWheel.WFilter(1, 'GFP', 'GFP exciter', 0),
-                   ExciterWheel.WFilter(2, 'TxRed' , 'TxRed exciter', 0),
-                   ExciterWheel.WFilter(3, 'Cy5'  , 'Cy5 exciter'  , 0),
-                   ExciterWheel.WFilter(4, 'Cy5.5', 'Cy5.5 exciter', 0),
-                   ExciterWheel.WFilter(5, 'Cy7'  , 'Cy7 exciter'  , 0),
-                   ExciterWheel.WFilter(6, 'ND4'  , 'ND4'  , 0)]
+    exciterList = [ExciterWheel.WFilter(1, 'FITC', 'FITC exciter', 0),
+                   ExciterWheel.WFilter(2, '560' , '560 exciter', 0),
+                   ExciterWheel.WFilter(3, 'TxRed'  , 'TxRed exciter'  , 0),
+                   ExciterWheel.WFilter(4, 'Cy5', 'Cy5 exciter', 0),
+                   ExciterWheel.WFilter(5, 'Cy5.5'  , 'Cy5.5 exciter'  , 0),
+                   ExciterWheel.WFilter(6, 'EMPTY'  , 'EMPTY/no exciter'  , 0)]
 
-    filterpair = [ExciterWheel.FilterPair('GFP', 'GFP'),
-                  ExciterWheel.FilterPair('TxRed', 'TxRed'),
-                  ExciterWheel.FilterPair('Cy5', 'Cy5'),
-                  ExciterWheel.FilterPair('Cy5.5', 'Cy5.5'),
-                  ExciterWheel.FilterPair('Cy7', 'Cy7'),
-                  ExciterWheel.FilterPair('To be added', 'To be added')]
+    filterpair = [ExciterWheel.FilterPair('FITC', 'FITC'),
+    ExciterWheel.FilterPair('560', '560'),
+    ExciterWheel.FilterPair('TxRed', 'TxRed'),
+    ExciterWheel.FilterPair('Cy5', 'Cy5'),
+    ExciterWheel.FilterPair('Cy5', 'ChCy5'),
+    ExciterWheel.FilterPair('Cy5.5', 'Cy5.5')]
+
     try:
-        scope.exciterWheel = ExciterWheel.FiltWheel(exciterList, filterpair, 'COM22', dichroic=scope.dichroic)
+        scope.exciterWheel = ExciterWheel.FiltWheel(exciterList, filterpair, 'COM19', dichroic=scope.dichroic)
         #scope.filterWheel.SetFilterPos("LF488")
         scope.exciterPan = ExciterWheel.FiltFrame(MainFrame, scope.exciterWheel)
         MainFrame.toolPanels.append((scope.exciterPan, 'Exciter Wheel'))
@@ -217,26 +191,20 @@ def exciter_wheel(MainFrame,scope):
 @init_hardware('Lasers')
 def lasers(scope):
     from PYME.Acquire.Hardware import lasers
-    sb = lasers.SBox(com_port='COM6')
+    sb = lasers.SBox(com_port='COM20')
     scope.l671 = lasers.SerialSwitchedLaser('l671',sb,0,scopeState = scope.state)
     scope.l671.register(scope)
-    #scope.l532 = lasers.SerialSwitchedLaser('l532',sb,2,scopeState = scope.state)
-    #scope.l532.register(scope)
     
-    from PYME.Acquire.Hardware import matchboxLaser
-    scope.l405 = matchboxLaser.MatchboxLaser('l405',portname='COM5',scopeState = scope.state)
-    scope.l405.register(scope)
-    
-    from PYME.Acquire.Hardware import phoxxLaserOLD
-    scope.l647 = phoxxLaserOLD.PhoxxLaser('l647',portname='COM15',scopeState = scope.state)
-    scope.StatusCallbacks.append(scope.l647.GetStatusText)
-    scope.l647.register(scope)
+    from PYME.Acquire.Hardware import phoxxLaser
+    scope.l642 = phoxxLaser.PhoxxLaser('l642',portname='COM24',scopeState = scope.state)
+    scope.CleanupFunctions.append(scope.l642.Close)
+    scope.l642.register(scope)
     
     from PYME.Acquire.Hardware import cobaltLaser
-    scope.l561 = cobaltLaser.CobaltLaser('l561',portname='COM10',minpower=0.1, maxpower=0.2,scopeState = scope.state)
-    scope.l561.register(scope)
-    scope.l488 = cobaltLaser.CobaltLaser('l488',portname='COM9',minpower=0.001, maxpower=0.2,scopeState = scope.state)
-    scope.l488.register(scope)
+#    scope.l561 = cobaltLaser.CobaltLaser('l561',portname='COM23',minpower=0.1, maxpower=0.2,scopeState = scope.state)
+#    scope.l561.register(scope)
+    scope.l405 = cobaltLaser.CobaltLaser('l405',portname='COM25',minpower=0.001, maxpower=0.1,scopeState = scope.state)
+    scope.l405.register(scope)
 
 
 @init_gui('Laser Control 1')
@@ -255,43 +223,6 @@ def laser_ctr2(MainFrame, scope):
         lcf = LaserControlFrame.LaserControlLight(MainFrame,scope.lasers)
         MainFrame.time1.WantNotification.append(lcf.refresh)
         MainFrame.camPanels.append((lcf, 'Laser Control'))
-
-#temporarily take the DMD module out. For now we use the manufacturer's software to control the DMD - Ruisheng
-# do we get errors if this is not present ?
-# @init_hardware('DMD')
-# def dmd(scope):
-#     from PYME.Acquire.Hardware import TiLightCrafter
-
-#     scope.LC = TiLightCrafter.LightCrafter()
-#     scope.LC.Connect()
-#     scope.LC.SetDisplayMode(scope.LC.DISPLAY_MODE.DISP_MODE_IMAGE)
-#     scope.LC.SetStatic(255)
-
-# # do we get errors if this is not present ?
-# @init_gui('DMDGui')
-# def dmd_gui(MainFrame, scope):
-#     from PYME.Acquire.Hardware import DMDGui
-#     DMDModeSelectionPanel = DMDGui.DMDModeChooserPanel(MainFrame, scope)
-#     DMDtpPanel = DMDGui.DMDTestPattern(MainFrame, scope.LC)
-#     DMDsiPanel = DMDGui.DMDStaticImage(MainFrame, scope.LC)
-#     DMDseqPanel = DMDGui.DMDImageSeq(MainFrame, scope.LC)
-#     MainFrame.camPanels.append((DMDModeSelectionPanel, 'select DMD Mode'))
-#     MainFrame.camPanels.append((DMDtpPanel, 'select test pattern'))
-#     MainFrame.camPanels.append((DMDsiPanel, 'select static image'))
-#     MainFrame.camPanels.append((DMDseqPanel, 'select image sequence'))
-
-
-@init_gui('Arclamp')
-def arclamp(MainFrame, scope):
-    from PYME.Acquire.Hardware import priorLumen, arclampshutterpanel
-    try:
-        scope.arclampshutter = priorLumen.PriorLumen('Arc lamp shutter', portname='COM23')
-        scope.shuttercontrol = [scope.arclampshutter]
-        acf = arclampshutterpanel.Arclampshutterpanel(MainFrame,scope.shuttercontrol)
-        MainFrame.time1.WantNotification.append(acf.refresh)
-        MainFrame.camPanels.append((acf, 'Shutter Control'))
-    except:
-        print 'Error starting arc-lamp shutter ...'
 
 
 @init_gui('Action Panel')
