@@ -201,8 +201,8 @@ def lasers(scope):
     scope.l642.register(scope)
     
     from PYME.Acquire.Hardware import cobaltLaser
-#    scope.l561 = cobaltLaser.CobaltLaser('l561',portname='COM23',minpower=0.1, maxpower=0.2,scopeState = scope.state)
-#    scope.l561.register(scope)
+    scope.l561 = cobaltLaser.CobaltLaser('l561',portname='COM23',minpower=0.1, maxpower=0.2,scopeState = scope.state)
+    scope.l561.register(scope)
     scope.l405 = cobaltLaser.CobaltLaser('l405',portname='COM25',minpower=0.001, maxpower=0.1,scopeState = scope.state)
     scope.l405.register(scope)
 
@@ -210,7 +210,7 @@ def lasers(scope):
 @init_gui('Laser Control 1')
 def laser_ctr1(MainFrame, scope):
     from PYME.Acquire.ui import lasersliders
-    lsf = lasersliders.LaserSliders(MainFrame.toolPanel, scope.lasers)
+    lsf = lasersliders.LaserSliders(toolPanel, scope.state)
     MainFrame.time1.WantNotification.append(lsf.update)
     #lsf.update()
     MainFrame.camPanels.append((lsf, 'Laser Powers'))
