@@ -241,8 +241,8 @@ def lasers(scope):
 
 @init_gui('Laser Control 1')
 def laser_ctr1(MainFrame, scope):
-    from PYME.Acquire import lasersliders
-    lsf = lasersliders.LaserSliders(MainFrame.toolPanel, scope.lasers)
+    from PYME.Acquire.ui import lasersliders
+    lsf = lasersliders.LaserSliders(MainFrame.toolPanel, scope.state)
     MainFrame.time1.WantNotification.append(lsf.update)
     #lsf.update()
     MainFrame.camPanels.append((lsf, 'Laser Powers'))
