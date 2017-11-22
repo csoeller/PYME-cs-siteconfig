@@ -242,7 +242,7 @@ def lasers(scope):
 @init_gui('Laser Control 1')
 def laser_ctr1(MainFrame, scope):
     from PYME.Acquire.ui import lasersliders
-    lsf = lasersliders.LaserSliders(MainFrame.toolPanel, scope.state)
+    lsf = lasersliders.LaserSliders_(MainFrame.toolPanel, scope.lasers)
     MainFrame.time1.WantNotification.append(lsf.update)
     #lsf.update()
     MainFrame.camPanels.append((lsf, 'Laser Powers'))
@@ -250,11 +250,12 @@ def laser_ctr1(MainFrame, scope):
 
 @init_gui('Laser Control 2')
 def laser_ctr2(MainFrame, scope):
+    from PYME.Acquire.ui import lasersliders
     if 'lasers'in dir(scope):
-        from PYME.Acquire.Hardware import LaserControlFrame
-        lcf = LaserControlFrame.LaserControlLight(MainFrame,scope.lasers)
-        MainFrame.time1.WantNotification.append(lcf.refresh)
+        lcf = lasersliders.LaserToggles(MainFrame.toolPanel, scope.state)
+        MainFrame.time1.WantNotification.append(lcf.update)
         MainFrame.camPanels.append((lcf, 'Laser Control'))
+
 
 #temporarily take the DMD module out. For now we use the manufacturer's software to control the DMD - Ruisheng
 # do we get errors if this is not present ?
