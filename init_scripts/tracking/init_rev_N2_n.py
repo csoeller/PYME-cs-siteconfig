@@ -45,7 +45,7 @@ def ueye_cam(scope):
     cl = uCam480.GetCameraList()
     pprint.pprint(cl)
 
-    cam = uCam480.uc480Camera(findcamID_startswith('UI324x'),nbits=12, isDeviceID=True)
+    cam = uCam480.uc480Camera(findcamID_startswith('UI327x'),nbits=12, isDeviceID=True)
     cam.SetGain(50)
     scope.register_camera(cam, 'UEye')
 
