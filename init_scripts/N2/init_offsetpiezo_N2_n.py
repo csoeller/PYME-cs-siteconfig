@@ -169,6 +169,7 @@ def focus_keys_z(MainFrame,scope):
 def focus_keys_xy(MainFrame,scope):
     from PYME.Acquire.Hardware import focusKeys
     Posk = focusKeys.PositionKeys(MainFrame, scope.piezos[1], scope.piezos[2], scope=scope)
+    MainFrame.time1.WantNotification.append(Posk.refresh)
 
 
 @init_gui('Filter Wheel')
