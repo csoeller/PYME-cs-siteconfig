@@ -68,6 +68,7 @@ def ueye_cam(scope):
 
     cam = uCam480.uc480Camera(findcamID_startswith('UI306x'),nbits=12, isDeviceID=True)
     cam.SetGain(50)
+    cam.SetActive(False)
     cam.port = 'L100'
     scope.register_camera(cam, 'UEye', 'L100')
 
