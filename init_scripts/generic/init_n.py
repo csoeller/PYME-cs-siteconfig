@@ -64,9 +64,11 @@ def cam_controls(MainFrame, scope):
 @init_gui('Sample database')
 def samp_db(MainFrame, scope):
     from PYME.Acquire import sampleInformation
+    from PYME.IO import MetaDataHandler
     sampPan = sampleInformation.slidePanel(MainFrame)
     MainFrame.camPanels.append((sampPan, 'Current Slide'))
-
+    MetaDataHandler.provideStartMetadata.append(lambda mdh: sampleInformation.getSampleDataFailsafe(MainFrame,mdh))
+    
 @init_gui('Analysis settings')
 def anal_settings(MainFrame, scope):
     from PYME.Acquire.ui import AnalysisSettingsUI

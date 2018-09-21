@@ -64,9 +64,9 @@ def ixon_controls(MainFrame,scope):
 @init_gui('sample database')
 def sample_db(MainFrame,scope):
     from PYME.IO import MetaDataHandler
-    from PYME.Acquire import sampleInformationDjangoDirect as sampleInformation
+    from PYME.Acquire import sampleInformation
     sampPan = sampleInformation.slidePanel(MainFrame)
-    MetaDataHandler.provideStartMetadata.append(lambda mdh: sampleInformation.getSampleDataFailesafe(MainFrame,mdh))
+    MetaDataHandler.provideStartMetadata.append(lambda mdh: sampleInformation.getSampleDataFailsafe(MainFrame,mdh))
     MainFrame.camPanels.append((sampPan, 'Current Slide'))
 
 

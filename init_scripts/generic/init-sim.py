@@ -93,9 +93,11 @@ camPanels.append((scope.camControls['Fake Camera'], 'EMCCD Properties'))
 """)
 
 InitGUI("""
-from PYME.Acquire import sampleInformationDjangoDirect as sampleInformation
+from PYME.Acquire import sampleInformation as sampleInformation
+from PYME.IO import MetaDataHandler
+
 sampPan = sampleInformation.slidePanel(MainFrame)
-MetaDataHandler.provideStartMetadata.append(lambda mdh: sampleInformation.getSampleDataFailesafe(MainFrame,mdh))
+MetaDataHandler.provideStartMetadata.append(lambda mdh: sampleInformation.getSampleDataFailsafe(MainFrame,mdh))
 camPanels.append((sampPan, 'Current Slide'))
 """)
 
