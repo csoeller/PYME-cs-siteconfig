@@ -66,7 +66,8 @@ def init_zpiezo(scope):
 
 @init_gui('Drift tracking')
 def init_driftTracking(MainFrame,scope):
-    from PYME.Acquire.Hardware import driftTracking, driftTrackGUI
+    # we changed this to PYMEcs, i.e. our extra code
+    from PYMEcs.Acquire.Hardware import driftTracking, driftTrackGUI
     scope.dt = driftTracking.correlator(scope, scope.piFoc)
     dtp = driftTrackGUI.DriftTrackingControl(MainFrame, scope.dt)
     MainFrame.camPanels.append((dtp, 'Focus Lock'))
