@@ -26,6 +26,8 @@ from PYME.Acquire.ExecTools import joinBGInit, HWNotPresent, init_gui, init_hard
 import scipy
 import time
 
+scope.microscope_name = 'PYMESimulator'
+
 @init_hardware('Fake Piezos')
 def pz(scope):
     from PYME.Acquire.Hardware.Simulator import fakePiezo
@@ -104,6 +106,12 @@ def laser_controls(MainFrame, scope):
     lsf = lasersliders.LaserSliders(MainFrame.toolPanel, scope.state)
     MainFrame.time1.WantNotification.append(lsf.update)
     MainFrame.camPanels.append((lsf, 'Laser Powers'))
+
+@init_gui('splitter')
+def ini_splitter(MainFrame,scope):
+    from PYME.Acquire.Hardware import splitter
+    splt = splitter.Splitter(MainFrame, scope, scope.cam, flipChan = 0,
+                             transLocOnCamera = 'bottom', flip=False, dir='up_down', constrain=False, dichroic='Test-dichroic')
 
 @init_gui('Focus Keys')
 def focus_keys(MainFrame, scope):
