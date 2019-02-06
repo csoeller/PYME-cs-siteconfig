@@ -203,9 +203,9 @@ def lasers(scope):
     scope.l642.register(scope)
     
     from PYME.Acquire.Hardware import cobaltLaser
-    scope.l561 = cobaltLaser.CobaltLaser('l561',portname='COM23',minpower=0.1, maxpower=0.2,scopeState = scope.state)
+    scope.l561 = cobaltLaser.CobaltLaserE('l561',portname='COM23',minpower=0.1, maxpower=0.2,scopeState = scope.state)
     scope.l561.register(scope)
-    scope.l405 = cobaltLaser.CobaltLaser('l405',portname='COM25',minpower=0.001, maxpower=0.1,scopeState = scope.state)
+    scope.l405 = cobaltLaser.CobaltLaserE('l405',portname='COM25',minpower=0.001, maxpower=0.1,scopeState = scope.state)
     scope.l405.register(scope)
 
 
