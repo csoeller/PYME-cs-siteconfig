@@ -76,7 +76,7 @@ def samp_db(MainFrame, scope):
 def init_zpiezo(scope):
     from PYME.Acquire.Hardware.Piezos import piezo_e816, offsetPiezo
 
-    scope._piFoc = piezo_e816.piezo_e816('COM22', 400, 0, False)
+    scope._piFoc = piezo_e816.piezo_e816T('COM22', 400, 0, False)
     scope.piFoc = offsetPiezo.piezoOffsetProxy(scope._piFoc)
     scope.register_piezo(scope.piFoc, 'z') # David's code has an extra ...,needCamRestart=True)
 
@@ -96,8 +96,8 @@ def init_xy(scope):
     scope.joystick.Enable(True)
     scope.CleanupFunctions.append(scope.stage.Cleanup)
 
-    scope.register_piezo(scope.stage, 'x', channel=0, multiplier=1000)
-    scope.register_piezo(scope.stage, 'y', channel=1, multiplier=-1000)
+    scope.register_piezo(scope.stage, 'x', channel=0, multiplier=1)
+    scope.register_piezo(scope.stage, 'y', channel=1, multiplier=1)
 
 
 # @init_gui('tracker')
@@ -140,10 +140,11 @@ def focus_keys_z(MainFrame,scope):
     MainFrame.time1.WantNotification.append(fk.refresh)
 
 
-@init_gui('Focus Keys xy')
-def focus_keys_xy(MainFrame,scope):
-    from PYME.Acquire.Hardware import focusKeys
-    Posk = focusKeys.PositionKeys(MainFrame, scope.piezos[1], scope.piezos[2], scope=scope)
+# @init_gui('Focus Keys xy')
+# def focus_keys_xy(MainFrame,scope):
+#     from PYME.Acquire.Hardware import focusKeys
+#     Posk = focusKeys.PositionKeys(MainFrame, scope.piezos[1], scope.piezos[2], scope=scope)
+#     MainFrame.time1.WantNotification.append(Posk.refresh)
 
 
 @init_gui('Filter Wheel')
