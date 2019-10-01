@@ -157,7 +157,7 @@ def filter_wheel(MainFrame,scope):
                 WFilter(5, 'ND3'  , 'UVND 3'  , 3),
                 WFilter(6, 'ND4'  , 'UVND 4'  , 4)]
     try:
-        scope.filterWheel = FiltWheel(filtList, 'COM18')
+        scope.filterWheel = FiltWheel(filtList, 'COM7')
         #scope.filterWheel.SetFilterPos("LF488")
         scope.filtPan = FiltFrame(MainFrame, scope.filterWheel)
         MainFrame.toolPanels.append((scope.filtPan, 'Filter Wheel'))
