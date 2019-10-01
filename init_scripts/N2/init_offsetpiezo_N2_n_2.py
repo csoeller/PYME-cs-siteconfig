@@ -185,7 +185,7 @@ def filter_wheel(MainFrame,scope):
                 WFilter(5, 'ND3'  , 'UVND 3'  , 3),
                 WFilter(6, 'ND4'  , 'UVND 4'  , 4)]
     try:
-        scope.filterWheel = FiltWheel(filtList, 'COM21')
+        scope.filterWheel = FiltWheel(filtList, 'COM13')
         #scope.filterWheel.SetFilterPos("LF488")
         scope.filtPan = FiltFrame(MainFrame, scope.filterWheel)
         MainFrame.toolPanels.append((scope.filtPan, 'Filter Wheel'))
@@ -235,6 +235,13 @@ def lasers(scope):
     scope.l647 = phoxxLaserOLD.PhoxxLaser('l647',portname='COM15',scopeState = scope.state)
     scope.StatusCallbacks.append(scope.l647.GetStatusText)
     scope.l647.register(scope)
+    # second 647 laser for DMD illumination
+    try:
+        scope.l647_2 = phoxxLaserOLD.PhoxxLaser('l647_2',portname='COM12',scopeState = scope.state)
+        scope.StatusCallbacks.append(scope.l647_2.GetStatusText)
+        scope.l647_2.register(scope)
+    except:
+        print 'Error starting the second 647 nm laser ...'
     
     from PYME.Acquire.Hardware import cobaltLaser
     scope.l561 = cobaltLaser.CobaltLaserE('l561',portname='COM10',minpower=0.1, maxpower=0.2,scopeState = scope.state)
