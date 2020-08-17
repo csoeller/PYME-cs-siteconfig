@@ -43,20 +43,20 @@ def zyla_controls(MainFrame,scope):
     MainFrame.camPanels.append((scope.camControls['Zyla'], 'sCMOS Properties'))
 
 
-@init_gui('sample database')
-def sample_db(MainFrame,scope):
-    from PYME.IO import MetaDataHandler
-    from PYME.Acquire import sampleInformationDjangoDirect as sampleInformation
-    sampPan = sampleInformation.slidePanel(MainFrame)
-    MetaDataHandler.provideStartMetadata.append(lambda mdh: sampleInformation.getSampleDataFailesafe(MainFrame,mdh))
-    MainFrame.camPanels.append((sampPan, 'Current Slide'))
+# @init_gui('sample database')
+# def sample_db(MainFrame,scope):
+#     from PYME.IO import MetaDataHandler
+#     from PYME.Acquire import sampleInformationDjangoDirect as sampleInformation
+#     sampPan = sampleInformation.slidePanel(MainFrame)
+#     MetaDataHandler.provideStartMetadata.append(lambda mdh: sampleInformation.getSampleDataFailesafe(MainFrame,mdh))
+#     MainFrame.camPanels.append((sampPan, 'Current Slide'))
 
 
-@init_gui('Focus Keys z')
-def focus_keys_z(MainFrame,scope):
-    from PYME.Acquire.Hardware import focusKeys
-    fk = focusKeys.FocusKeys(MainFrame, scope.piezos[0], scope=scope)
-    MainFrame.time1.WantNotification.append(fk.refresh)
+# @init_gui('Focus Keys z')
+# def focus_keys_z(MainFrame,scope):
+#     from PYME.Acquire.Hardware import focusKeys
+#     fk = focusKeys.FocusKeys(MainFrame, scope.piezos[0], scope=scope)
+#     MainFrame.time1.WantNotification.append(fk.refresh)
 
 
 #must be here!!!
