@@ -31,6 +31,7 @@ def init_zyla(scope):
     cam.port = 'R100'
     cam.orientation = dict(rotate=False, flipx=False, flipy=False)
     cam.DefaultEMGain = 0 #hack to make camera work with standard protocols
+    cam.SetROI(512,512,1024,1024)
     #cam.SetSimpleGainMode('16-bit (low noise & high well capacity)')
     
     scope.register_camera(cam, 'Zyla')
