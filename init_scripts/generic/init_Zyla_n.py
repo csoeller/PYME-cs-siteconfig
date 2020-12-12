@@ -35,7 +35,7 @@ def init_zyla(scope):
     #cam.SetSimpleGainMode('16-bit (low noise & high well capacity)')
     
     scope.register_camera(cam, 'Zyla')
-
+    scope.StatusCallbacks.append(cam.TemperatureStatusText)
     
 @init_gui('Zyla Controls')
 def zyla_controls(MainFrame,scope):
