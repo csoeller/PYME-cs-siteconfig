@@ -23,8 +23,6 @@
 
 #!/usr/bin/python
 from PYME.Acquire.ExecTools import joinBGInit, HWNotPresent, init_gui, init_hardware
-import scipy
-import time
 
 scope.microscope_name = 'PYMESimulator'
 
@@ -124,12 +122,36 @@ def focus_keys_xy(MainFrame,scope):
     from PYME.Acquire.Hardware import focusKeys
     Posk = focusKeys.PositionKeys(MainFrame, scope.piezos[1], scope.piezos[2], scope=scope)
 
+# this tests using the action manager to queue actions
+# makes these available as menu entries
+@init_gui('ROI Calibration')
+def roi_calibration(MainFrame, scope):
+
+    def roi_action_callback(event=None):
+        from PYMEcs.Acquire.Actions.custom import queue_roi_series
+        queue_roi_series(scope)
+
+    def camera_chip_calibration_callback(event=None):
+        from PYMEcs.Acquire.Actions.custom import camera_chip_calibration_series
+        camera_chip_calibration_series(scope)
+
+    # ToDo - add help strings
+    MainFrame.AddMenuItem('Calibration', 'Camera Maps>Test ROI actions', roi_action_callback)
+    MainFrame.AddMenuItem('Calibration', 'Camera Maps>Tile over Chip ROIs', camera_chip_calibration_callback)
+
 @init_gui('Action manager')
 def action_manager(MainFrame, scope):
     from PYME.Acquire.ui import actionUI
     
     ap = actionUI.ActionPanel(MainFrame, scope.actions, scope)
     MainFrame.AddPage(ap, caption='Queued Actions')
+
+@init_gui('Tiling')
+def action_manager(MainFrame, scope):
+    from PYME.Acquire.ui import tile_panel
+    
+    ap = tile_panel.TilePanel(MainFrame, scope)
+    MainFrame.aqPanels.append((ap, 'Tiling'))
 
 
 #must be here!!!
