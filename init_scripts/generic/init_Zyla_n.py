@@ -49,17 +49,13 @@ def zyla_controls(MainFrame,scope):
 @init_gui('ROI Calibration')
 def roi_calibration(MainFrame, scope):
 
-    def roi_action_callback(event=None):
-        from PYMEcs.Acquire.Actions.custom import queue_roi_series
-        queue_roi_series(scope)
-
     def camera_chip_calibration_callback(event=None):
         from PYMEcs.Acquire.Actions.custom import camera_chip_calibration_series
         camera_chip_calibration_series(scope)
 
-    # ToDo - add help strings
-    MainFrame.AddMenuItem('Calibration', 'Camera Maps>Test ROI actions', roi_action_callback)
-    MainFrame.AddMenuItem('Calibration', 'Camera Maps>Tile over Chip ROIs', camera_chip_calibration_callback)
+    # MainFrame.AddMenuItem('Calibration', 'Camera Maps>Test ROI actions', roi_action_callback) # this was just a test
+    MainFrame.AddMenuItem('Calibration', 'Camera Maps>Tile over Chip ROIs', camera_chip_calibration_callback,
+                          helpText='Acquire data for camera maps by tiling acquisitions over the full chip size')
 
 @init_gui('Action manager')
 def action_manager(MainFrame, scope):
