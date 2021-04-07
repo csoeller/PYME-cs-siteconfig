@@ -127,17 +127,18 @@ def focus_keys_xy(MainFrame,scope):
 @init_gui('ROI Calibration')
 def roi_calibration(MainFrame, scope):
 
-    def roi_action_callback(event=None):
-        from PYMEcs.Acquire.Actions.custom import queue_roi_series
-        queue_roi_series(scope)
+    # def roi_action_callback(event=None):
+    #     from PYMEcs.Acquire.Actions.custom import queue_roi_series
+    #     queue_roi_series(scope)
 
     def camera_chip_calibration_callback(event=None):
         from PYMEcs.Acquire.Actions.custom import camera_chip_calibration_series
         camera_chip_calibration_series(scope)
 
     # ToDo - add help strings
-    MainFrame.AddMenuItem('Calibration', 'Camera Maps>Test ROI actions', roi_action_callback)
-    MainFrame.AddMenuItem('Calibration', 'Camera Maps>Tile over Chip ROIs', camera_chip_calibration_callback)
+    # MainFrame.AddMenuItem('Calibration', 'Camera Maps>Test ROI actions', roi_action_callback)
+    MainFrame.AddMenuItem('Calibration', 'Camera Maps>Tile over Chip ROIs',
+                          camera_chip_calibration_callback, helpText='Iterate acquisitions over the whole camera chip area by tiling; used to acquire raw data for camera map construction')
 
 @init_gui('Action manager')
 def action_manager(MainFrame, scope):
@@ -146,16 +147,15 @@ def action_manager(MainFrame, scope):
     ap = actionUI.ActionPanel(MainFrame, scope.actions, scope)
     MainFrame.AddPage(ap, caption='Queued Actions')
 
-@init_gui('Tiling')
-def action_manager(MainFrame, scope):
-    from PYME.Acquire.ui import tile_panel
+# @init_gui('Tiling')
+# def action_manager(MainFrame, scope):
+#     from PYME.Acquire.ui import tile_panel
     
-    ap = tile_panel.TilePanel(MainFrame, scope)
-    MainFrame.aqPanels.append((ap, 'Tiling'))
+#     ap = tile_panel.TilePanel(MainFrame, scope)
+#     MainFrame.aqPanels.append((ap, 'Tiling'))
 
 
 #must be here!!!
 joinBGInit() #wait for anyhting which was being done in a separate thread
 
 scope.initDone = True
-
