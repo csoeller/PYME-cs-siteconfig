@@ -133,3 +133,7 @@ dmypy.json
 .pyre/
 
 *.py~
+
+launchers/Bern-PC184/PYMEAcquire.log.1
+
+launchers/Bern-PC184/PYMEAcquire.log.3
