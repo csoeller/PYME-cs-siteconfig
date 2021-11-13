@@ -71,10 +71,10 @@ def samp_db(MainFrame, scope):
     MainFrame.camPanels.append((sampPan, 'Current Slide'))
     MetaDataHandler.provideStartMetadata.append(lambda mdh: sampleInformation.getSampleDataFailsafe(MainFrame,mdh))
     
-@init_gui('Analysis settings')
-def anal_settings(MainFrame, scope):
-    from PYME.Acquire.ui import AnalysisSettingsUI
-    AnalysisSettingsUI.Plug(scope, MainFrame)
+# @init_gui('Analysis settings')
+# def anal_settings(MainFrame, scope):
+#     from PYME.Acquire.ui import AnalysisSettingsUI
+#     AnalysisSettingsUI.Plug(scope, MainFrame)
 
 @init_gui('Fake DMD')
 def fake_dmd(MainFrame, scope):
