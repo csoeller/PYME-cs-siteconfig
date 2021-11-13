@@ -49,7 +49,9 @@ def ueye_cam(scope):
     cl = uCam480.GetCameraList()
     pprint.pprint(cl)
 
-    cam = uCam480.uc480Camera(findcamID_startswith('UI306x'),nbits=12, isDeviceID=True)
+    # note that model name and serno are byte type, so checks should be done aginst byte literals, e.g. b'UI306x'
+    # note sure if this will work with python 2 though?
+    cam = uCam480.uc480Camera(findcamID_startswith(b'UI306x'),nbits=12, isDeviceID=True)
     cam.SetGain(50)
     scope.register_camera(cam, 'UEye')
 
@@ -61,11 +63,11 @@ def cam_control(MainFrame, scope):
 
 scope.lasers = [] # we need that for most protocols
 
-@init_gui('Sample database')
-def samp_db(MainFrame, scope):
-    from PYME.Acquire import sampleInformation
-    sampPan = sampleInformation.slidePanel(MainFrame)
-    MainFrame.camPanels.append((sampPan, 'Current Slide'))
+# @init_gui('Sample database')
+# def samp_db(MainFrame, scope):
+#     from PYME.Acquire import sampleInformation
+#     sampPan = sampleInformation.slidePanel(MainFrame)
+#     MainFrame.camPanels.append((sampPan, 'Current Slide'))
 
 
 #must be here!!!
