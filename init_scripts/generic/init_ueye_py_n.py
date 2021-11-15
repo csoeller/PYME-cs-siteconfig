@@ -45,23 +45,23 @@ def ueye_cam(scope):
 
         return None
 
-    cam = UEyeCamera(0, 10)
+    cam = UEyeCamera(0, 12)
     cam.SetGain(50)
     scope.register_camera(cam, 'UEye')
 
-@init_gui('Camera controls')
-def cam_control(MainFrame, scope):
-    from PYME.Acquire.Hardware.uc480 import ucCamControlFrame
-    scope.camControls['UEye'] = ucCamControlFrame.ucCamPanel(MainFrame, scope.cameras['UEye'], scope)
-    MainFrame.camPanels.append((scope.camControls['UEye'], 'UEye Properties'))
+# @init_gui('Camera controls')
+# def cam_control(MainFrame, scope):
+#     from PYME.Acquire.Hardware.uc480 import ucCamControlFrame
+#     scope.camControls['UEye'] = ucCamControlFrame.ucCamPanel(MainFrame, scope.cameras['UEye'], scope)
+#     MainFrame.camPanels.append((scope.camControls['UEye'], 'UEye Properties'))
 
 scope.lasers = [] # we need that for most protocols
 
-@init_gui('Sample database')
-def samp_db(MainFrame, scope):
-    from PYME.Acquire import sampleInformation
-    sampPan = sampleInformation.slidePanel(MainFrame)
-    MainFrame.camPanels.append((sampPan, 'Current Slide'))
+# @init_gui('Sample database')
+# def samp_db(MainFrame, scope):
+#     from PYME.Acquire import sampleInformation
+#     sampPan = sampleInformation.slidePanel(MainFrame)
+#     MainFrame.camPanels.append((sampPan, 'Current Slide'))
 
 
 #must be here!!!
