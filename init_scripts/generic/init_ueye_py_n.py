@@ -49,11 +49,11 @@ def ueye_cam(scope):
     cam.SetGain(50)
     scope.register_camera(cam, 'UEye')
 
-# @init_gui('Camera controls')
-# def cam_control(MainFrame, scope):
-#     from PYME.Acquire.Hardware.uc480 import ucCamControlFrame
-#     scope.camControls['UEye'] = ucCamControlFrame.ucCamPanel(MainFrame, scope.cameras['UEye'], scope)
-#     MainFrame.camPanels.append((scope.camControls['UEye'], 'UEye Properties'))
+@init_gui('Camera controls')
+def cam_control(MainFrame, scope):
+    from PYME.Acquire.Hardware.uc480 import ucCamControlFrame
+    scope.camControls['UEye'] = ucCamControlFrame.ucCamPanel(MainFrame, scope.cameras['UEye'], scope)
+    MainFrame.camPanels.append((scope.camControls['UEye'], 'UEye Properties'))
 
 scope.lasers = [] # we need that for most protocols
 
