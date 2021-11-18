@@ -51,7 +51,11 @@ def ueye_cam(scope):
 
     # note that model name and serno are byte type, so checks should be done aginst byte literals, e.g. b'UI306x'
     # note sure if this will work with python 2 though?
-    cam = uCam480.uc480Camera(findcamID_startswith(b'UI306x'),nbits=12, isDeviceID=True)
+    camid = findcamID_startswith(b'UI306x')
+    if camid is not None:
+        cam = uCam480.uc480Camera(camid, nbits=12, isDeviceID=True)
+    else:
+        cam = uCam480.uc480Camera()
     cam.SetGain(50)
     scope.register_camera(cam, 'UEye')
 
