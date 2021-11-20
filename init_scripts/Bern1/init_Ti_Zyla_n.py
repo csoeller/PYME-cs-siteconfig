@@ -24,19 +24,16 @@
 from PYME.Acquire.ExecTools import joinBGInit, HWNotPresent, init_gui, init_hardware
 
 
-@init_hardware('Fake Piezos')
+@init_hardware('Z Piezo')
 def pz(scope):
-    from PYME.Acquire.Hardware.Simulator import fakePiezo
-    scope.fakePiezo = fakePiezo.FakePiezo(100)
-    scope.register_piezo(scope.fakePiezo, 'z', needCamRestart=True)
-    
-    scope.fakeXPiezo = fakePiezo.FakePiezo(100)
-    scope.register_piezo(scope.fakeXPiezo, 'x')
-    
-    scope.fakeYPiezo = fakePiezo.FakePiezo(100)
-    scope.register_piezo(scope.fakeYPiezo, 'y')
+    from PYME.Acquire.Hardware.Piezos import piezo_e709
 
-pz.join() #piezo must be there before we start camera
+    scope.piFoc = piezo_e709.piezo_e709T('COM6', 400, 0, True)
+    scope.hardwareChecks.append(scope.piFoc.OnTarget)
+    scope.CleanupFunctions.append(scope.piFoc.close)
+
+    scope.register_piezo(scope.piFoc, 'z')
+
 
 @init_hardware('Andor Zyla')
 def init_zyla(scope):
@@ -91,6 +88,12 @@ def filter_wheel(MainFrame,scope):
     except:
         print('Error starting filter wheel ...')
 
+
+@init_gui('Focus Keys z')
+def focus_keys_z(MainFrame,scope):
+    from PYME.Acquire.Hardware import focusKeys
+    fk = focusKeys.FocusKeys(MainFrame, scope.piezos[0], scope=scope)
+    MainFrame.time1.WantNotification.append(fk.refresh)
 
 @init_hardware('Lasers & Shutters')
 def lasers(scope):
