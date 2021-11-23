@@ -22,19 +22,7 @@
 ##################
 
 from PYME.Acquire.ExecTools import joinBGInit, HWNotPresent, init_gui, init_hardware
-
-
-@init_hardware('Z Piezo')
-def pz(scope):
-    from PYME.Acquire.Hardware.Piezos import piezo_e709
-
-    scope.piFoc = piezo_e709.piezo_e709T('COM6', 400, 0, True)
-    scope.hardwareChecks.append(scope.piFoc.OnTarget)
-    scope.CleanupFunctions.append(scope.piFoc.close)
-
-    scope.register_piezo(scope.piFoc, 'z')
-
-
+    
 @init_hardware('Andor Zyla')
 def init_zyla(scope):
     from PYME.Acquire.Hardware.AndorNeo import AndorZyla
@@ -71,6 +59,40 @@ def zyla_controls(MainFrame,scope):
     #MetaDataHandler.provideStartMetadata.append(scope.dichroic.ProvideMetadata)
     #MetaDataHandler.provideStartMetadata.append(scope.lightpath.ProvideMetadata)
 
+@init_hardware('Z Piezo')
+def pz(scope):
+    from PYME.Acquire.Hardware.Piezos import piezo_e709
+
+    scope.piFoc = piezo_e709.piezo_e709T('COM6', 400, 0, True)
+    scope.hardwareChecks.append(scope.piFoc.OnTarget)
+    scope.CleanupFunctions.append(scope.piFoc.close)
+
+    scope.register_piezo(scope.piFoc, 'z')
+
+@init_hardware('XY Stage')
+def init_xy(scope):
+    from PYME.Acquire.Hardware.Piezos import piezo_c867
+    scope.xystage = piezo_c867.piezo_c867T('COMXX')
+    scope.joystick = piezo_c867.c867Joystick(scope.xystage)
+    #scope.joystick.Enable(True)
+    scope.hardwareChecks.append(scope.xystage.OnTarget)
+    scope.CleanupFunctions.append(scope.xystage.close)
+
+    scope.register_piezo(scope.xystage, 'x', channel=1) # David's code has an extra ...,needCamRestart=True)
+    scope.register_piezo(scope.xystage, 'y', channel=2, multiplier=1) # David's code has an extra ...,needCamRestart=True)
+
+@init_gui('Focus Keys z')
+def focus_keys_z(MainFrame,scope):
+    from PYME.Acquire.Hardware import focusKeys
+    fk = focusKeys.FocusKeys(MainFrame, scope.piezos[0], scope=scope)
+    MainFrame.time1.WantNotification.append(fk.refresh)
+
+@init_gui('Focus Keys xy')
+def focus_keys_xy(MainFrame,scope):
+    from PYME.Acquire.Hardware import focusKeys
+    Posk = focusKeys.PositionKeys(MainFrame, scope.piezos[1], scope.piezos[2], scope=scope)
+    MainFrame.time1.WantNotification.append(Posk.refresh)
+
 @init_gui('Filter Wheel')
 def filter_wheel(MainFrame,scope):
     from PYME.Acquire.Hardware.FilterWheel import WFilter, FiltFrame, FiltWheel
@@ -88,13 +110,6 @@ def filter_wheel(MainFrame,scope):
     except:
         print('Error starting filter wheel ...')
 
-
-@init_gui('Focus Keys z')
-def focus_keys_z(MainFrame,scope):
-    from PYME.Acquire.Hardware import focusKeys
-    fk = focusKeys.FocusKeys(MainFrame, scope.piezos[0], scope=scope)
-    MainFrame.time1.WantNotification.append(fk.refresh)
-
 @init_hardware('Lasers & Shutters')
 def lasers(scope):
     from PYME.Acquire.Hardware import phoxxLaser
@@ -103,8 +118,8 @@ def lasers(scope):
     scope.CleanupFunctions.append(scope.l647.Close)
     scope.lasers = [scope.l647, ]
 
-@init_gui('Laser controls')
-def laser_controls(MainFrame, scope):
+@init_gui('Laser Sliders')
+def laser_sliders(MainFrame, scope):
     from PYME.Acquire.ui import lasersliders
     
     lsf = lasersliders.LaserSliders(MainFrame.toolPanel, scope.state)
@@ -112,8 +127,8 @@ def laser_controls(MainFrame, scope):
     MainFrame.camPanels.append((lsf, 'Lasers', False, False))
 
 
-@init_gui('Laser Control 2')
-def laser_ctr2(MainFrame, scope):
+@init_gui('Laser Toggles')
+def laser_toggles(MainFrame, scope):
     from PYME.Acquire.ui import lasersliders
     if 'lasers'in dir(scope):
         lcf = lasersliders.LaserToggles(MainFrame.toolPanel, scope.state)
