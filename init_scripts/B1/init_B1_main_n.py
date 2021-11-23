@@ -61,13 +61,14 @@ def zyla_controls(MainFrame,scope):
 
 @init_hardware('Z Piezo')
 def pz(scope):
-    from PYME.Acquire.Hardware.Piezos import piezo_e709
+    from PYME.Acquire.Hardware.Piezos import piezo_e709, offsetPiezoREST
 
-    scope.piFoc = piezo_e709.piezo_e709T('COM6', 400, 0, True)
-    scope.hardwareChecks.append(scope.piFoc.OnTarget)
-    scope.CleanupFunctions.append(scope.piFoc.close)
+    scope._piFoc = piezo_e709.piezo_e709T('COM6', 400, 0, True)
+    #scope.hardwareChecks.append(scope.piFoc.OnTarget)
+    scope.CleanupFunctions.append(scope._piFoc.close)
 
-    scope.register_piezo(scope.piFoc, 'z')
+    scope.piFoc = offsetPiezoREST.server_class()(scope._piFoc)
+    scope.register_piezo(scope.piFoc, 'z', needCamRestart=True)
 
 @init_hardware('XY Stage')
 def init_xy(scope):
