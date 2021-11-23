@@ -72,7 +72,7 @@ def pz(scope):
 @init_hardware('XY Stage')
 def init_xy(scope):
     from PYME.Acquire.Hardware.Piezos import piezo_c867
-    scope.xystage = piezo_c867.piezo_c867T('COMXX')
+    scope.xystage = piezo_c867.piezo_c867T('COM7')
     scope.joystick = piezo_c867.c867Joystick(scope.xystage)
     #scope.joystick.Enable(True)
     scope.hardwareChecks.append(scope.xystage.OnTarget)
