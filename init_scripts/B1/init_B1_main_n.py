@@ -94,6 +94,13 @@ def focus_keys_xy(MainFrame,scope):
     Posk = focusKeys.PositionKeys(MainFrame, scope.piezos[1], scope.piezos[2], scope=scope)
     MainFrame.time1.WantNotification.append(Posk.refresh)
 
+@init_gui('spacenav')
+def ini_spacenav(MainFrame,scope):
+    from PYME.Acquire.Hardware import spacenav
+    scope.spacenav = spacenav.SpaceNavigator()
+    scope.CleanupFunctions.append(scope.spacenav.close)
+    scope.ctrl3d = spacenav.SpaceNavPiezoCtrl(scope.spacenav, scope.piFoc, scope.xystage)
+
 @init_gui('Filter Wheel')
 def filter_wheel(MainFrame,scope):
     from PYME.Acquire.Hardware.FilterWheel import WFilter, FiltFrame, FiltWheel
@@ -128,13 +135,14 @@ def laser_sliders(MainFrame, scope):
     MainFrame.camPanels.append((lsf, 'Lasers', False, False))
 
 
-@init_gui('Laser Toggles')
-def laser_toggles(MainFrame, scope):
-    from PYME.Acquire.ui import lasersliders
-    if 'lasers'in dir(scope):
-        lcf = lasersliders.LaserToggles(MainFrame.toolPanel, scope.state)
-        MainFrame.time1.WantNotification.append(lcf.update)
-        MainFrame.camPanels.append((lcf, 'Laser Control'))
+# the laser toggle buttons are now part of the improved laser sliders
+# @init_gui('Laser Toggles')
+# def laser_toggles(MainFrame, scope):
+#     from PYME.Acquire.ui import lasersliders
+#     if 'lasers'in dir(scope):
+#         lcf = lasersliders.LaserToggles(MainFrame.toolPanel, scope.state)
+#         MainFrame.time1.WantNotification.append(lcf.update)
+#         MainFrame.camPanels.append((lcf, 'Laser Control'))
 
 #must be here!!!
 joinBGInit() # wait for anything which was being done in a separate thread
