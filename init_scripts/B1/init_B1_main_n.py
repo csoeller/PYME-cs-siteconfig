@@ -104,12 +104,12 @@ def ini_spacenav(MainFrame,scope):
 @init_gui('Filter Wheel')
 def filter_wheel(MainFrame,scope):
     from PYME.Acquire.Hardware.FilterWheel import WFilter, FiltFrame, FiltWheel
-    filtList = [WFilter(1, 'EMPTY', 'EMPTY', 0),
-                WFilter(2, 'ND.5' , 'UVND 0.5', 0.5),
-                WFilter(3, 'ND1'  , 'UVND 1'  , 1),
-                WFilter(4, 'ND2', 'UVND 2', 2),
-                WFilter(5, 'ND3'  , 'UVND 3'  , 3),
-                WFilter(6, 'ND4'  , 'UVND 4'  , 4)]
+    filtList = [WFilter(1, 'GFP', 'GFP exciter', 0),
+                WFilter(2, 'TxRed' , 'TxRed exciter', 0),
+                WFilter(3, 'Cy5'  , 'Cy5 exciter'  , 0),
+                WFilter(4, 'Cy5.5', 'Cy5.5 exciter', 0),
+                WFilter(5, 'Cy7'  , 'Cy7 exciter'  , 0),
+                WFilter(6, 'ND4'  , 'UVND 4'  , 0)]
     try:
         scope.filterWheel = FiltWheel(filtList, 'COM4')
         #scope.filterWheel.SetFilterPos("LF488")

@@ -21,6 +21,7 @@
 #
 ##################
 from PYME.Acquire.ExecTools import joinBGInit, HWNotPresent, init_gui, init_hardware
+import time
 
 @init_hardware('Cameras')
 def cam(scope):
@@ -32,8 +33,8 @@ def cam(scope):
 @init_gui('Camera controls')
 def cam_control(MainFrame, scope):
     from PYME.Acquire.Hardware.uc480 import ucCamControlFrame
-    scope.camControls['UEye'] = ucCamControlFrame.ucCamPanel(MainFrame, scope.cameras['UEye'], scope)
-    MainFrame.camPanels.append((scope.camControls['UEye'], 'UEye Properties'))
+    scope.camControls['Drift'] = ucCamControlFrame.ucCamPanel(MainFrame, scope.cameras['Drift'], scope)
+    MainFrame.camPanels.append((scope.camControls['Drift'], 'Drift Cam Properties'))
 
 #PIFoc
 @init_hardware('PIFoc')
