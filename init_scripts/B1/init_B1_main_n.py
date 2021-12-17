@@ -124,7 +124,10 @@ def lasers(scope):
 
     scope.l647 = phoxxLaser.PhoxxLaser('l647', portname='COM3', scopeState=scope.state)
     scope.CleanupFunctions.append(scope.l647.Close)
-    scope.lasers = [scope.l647, ]
+    from PYME.Acquire.Hardware import cobaltLaser
+    scope.l561 = cobaltLaser.CobaltLaserE('l561',portname='COM8',minpower=0.1,maxpower=0.2,scopeState = scope.state)
+    scope.l488 = cobaltLaser.CobaltLaserE('l488',portname='COM9',minpower=0.005,maxpower=0.2,scopeState = scope.state)  
+    scope.lasers = [scope.l647,scope.l561,scope.l488]
 
 @init_gui('Laser Sliders')
 def laser_sliders(MainFrame, scope):
