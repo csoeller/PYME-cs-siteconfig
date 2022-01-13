@@ -96,14 +96,31 @@ def focus_keys_xy(MainFrame,scope):
     Posk = focusKeys.PositionKeys(MainFrame, scope.piezos[1], scope.piezos[2], scope=scope)
     MainFrame.time1.WantNotification.append(Posk.refresh)
 
-@init_gui('spacenav')
-def ini_spacenav(MainFrame,scope):
-    from PYME.Acquire.Hardware import spacenav
-    scope.spacenav = spacenav.SpaceNavigator()
-    scope.CleanupFunctions.append(scope.spacenav.close)
-    scope.ctrl3d = spacenav.SpaceNavPiezoCtrl(scope.spacenav, scope.piFoc, scope.xystage)
+#@init_gui('spacenav')
+#def ini_spacenav(MainFrame,scope):
+#    from PYME.Acquire.Hardware import spacenav
+#    scope.spacenav = spacenav.SpaceNavigator()
+#    scope.CleanupFunctions.append(scope.spacenav.close)
+#    scope.ctrl3d = spacenav.SpaceNavPiezoCtrl(scope.spacenav, scope.piFoc, scope.xystage)
 
-@init_gui('Filter Wheel')
+@init_gui('Filter Wheel 1')
+def filter_wheel(MainFrame,scope):
+    from PYME.Acquire.Hardware.FilterWheel import WFilter, FiltFrame, FiltWheel
+    filtList = [WFilter(1, 'EMPTY', 'EMPTY', 0),
+                WFilter(2, 'ND.5' , 'UVND 0.5', 0.5),
+                WFilter(3, 'ND1'  , 'UVND 1'  , 1),
+                WFilter(4, 'ND2', 'UVND 2', 2),
+                WFilter(5, 'ND3'  , 'UVND 3'  , 3),
+                WFilter(6, 'ND4'  , 'UVND 4'  , 4)]
+    try:
+        scope.filterWheel = FiltWheel(filtList, 'COM10')
+        #scope.filterWheel.SetFilterPos("LF488")
+        scope.filtPan = FiltFrame(MainFrame, scope.filterWheel)
+        MainFrame.toolPanels.append((scope.filtPan, 'Filter Wheel'))
+    except:
+        print('Error starting filter wheel ...')
+
+@init_gui('Filter Wheel 2')
 def filter_wheel(MainFrame,scope):
     from PYME.Acquire.Hardware.FilterWheel import WFilter, FiltFrame, FiltWheel
     filtList = [WFilter(1, 'GFP', 'GFP exciter', 0),
