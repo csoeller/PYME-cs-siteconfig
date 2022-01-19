@@ -6,6 +6,10 @@ __pycache__/
 # emacs
 *~
 \#*\#
+.\#*
+
+# PYME log files
+PYMEAcquire.log.*
 
 # C extensions
 *.so
