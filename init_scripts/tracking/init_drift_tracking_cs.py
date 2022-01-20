@@ -25,9 +25,15 @@ import time
 
 @init_hardware('Cameras')
 def cam(scope):
-    from PYME.Acquire.Hardware.uc480 import uCam480
-    uCam480.init(cameratype='ueye')
-    cam = uCam480.uc480Camera(0,nbits=12)
+    if True:
+        from PYME.Acquire.Hardware.uc480 import uCam480
+        uCam480.init(cameratype='ueye')
+        cam = uCam480.uc480Camera(0,nbits=12)
+    else: # use the pyueye interface
+        from PYME.Acquire.Hardware.ueye import UEyeCamera
+        cam = UEyeCamera(0, 12)
+    cam.SetIntegTime(1.0) # by default we use 1s integration time
+    # possibly set preamp gain as well - check!
     scope.register_camera(cam, 'Drift')
 
 @init_gui('Camera controls')
@@ -51,7 +57,8 @@ def pifoc(scope):
 def init_driftTracking(MainFrame,scope):
     # we changed this to PYMEcs, i.e. our extra code
     from PYMEcs.Acquire.Hardware import driftTracking, driftTrackGUI
-    scope.dt = driftTracking.correlator(scope, scope.piFoc)
+    # we limit stacksize to 2*7+1, possibly less in future?
+    scope.dt = driftTracking.correlator(scope, scope.piFoc, stackHalfSize = 7)
     dtp = driftTrackGUI.DriftTrackingControl(MainFrame, scope.dt)
     MainFrame.camPanels.append((dtp, 'Focus Lock'))
     MainFrame.time1.WantNotification.append(dtp.refresh)
