@@ -9,6 +9,7 @@ rem set PATH=c:\ProgramData\Miniconda3\condabin;C:\Program Files\IDS\uEye\develo
 
 call conda.bat activate pyme-shared
 
+cd \python-support-files\pymelogs\driftTracking
 pymeacquire -i %INITPATH%\tracking\init_drift_tracking_basic.py
 
 call conda deactivate
