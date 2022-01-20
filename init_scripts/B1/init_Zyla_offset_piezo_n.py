@@ -78,6 +78,34 @@ def filter_wheel(MainFrame,scope):
     except:
         print('Error starting filter wheel ...')
 
+@init_hardware('Lasers & Shutters')
+def lasers(scope):
+    from PYME.Acquire.Hardware import phoxxLaser
+
+    scope.l647 = phoxxLaser.PhoxxLaser('l647', portname='COM4', scopeState=scope.state)
+    scope.CleanupFunctions.append(scope.l647.Close)
+    from PYME.Acquire.Hardware import cobaltLaser
+    scope.l561 = cobaltLaser.CobaltLaserE('l561',portname='COM5',minpower=0.1,maxpower=0.2,scopeState = scope.state)
+    scope.l488 = cobaltLaser.CobaltLaserE('l488',portname='COM6',minpower=0.005,maxpower=0.2,scopeState = scope.state)  
+    scope.lasers = [scope.l647,scope.l561,scope.l488]
+
+@init_gui('Laser Sliders')
+def laser_sliders(MainFrame, scope):
+    from PYME.Acquire.ui import lasersliders
+    
+    lsf = lasersliders.LaserSliders(MainFrame.toolPanel, scope.state)
+    MainFrame.time1.WantNotification.append(lsf.update)
+    MainFrame.camPanels.append((lsf, 'Lasers', False, False))
+
+
+# the laser toggle buttons are now part of the improved laser sliders
+# @init_gui('Laser Toggles')
+# def laser_toggles(MainFrame, scope):
+#     from PYME.Acquire.ui import lasersliders
+#     if 'lasers'in dir(scope):
+#         lcf = lasersliders.LaserToggles(MainFrame.toolPanel, scope.state)
+#         MainFrame.time1.WantNotification.append(lcf.update)
+#         MainFrame.camPanels.append((lcf, 'Laser Control'))
 
 #must be here!!!
 joinBGInit() # wait for anything which was being done in a separate thread
