@@ -69,7 +69,7 @@ def init_driftTracking(MainFrame,scope):
 def focus_keys(MainFrame, scope):
     from PYME.Acquire.Hardware import focusKeys
     fk = focusKeys.FocusKeys(MainFrame, scope.piezos[0])
-
+    MainFrame.time1.WantNotification.append(fk.refresh)
 
 
 #must be here!!!
