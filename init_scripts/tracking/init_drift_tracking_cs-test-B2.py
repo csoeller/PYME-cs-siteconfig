@@ -60,7 +60,7 @@ def init_driftTracking(MainFrame,scope):
     # we changed this to PYMEcs, i.e. our extra code
     from PYMEcs.Acquire.Hardware import driftTracking, driftTrackGUI
     # we limit stacksize to 2*7+1, possibly less in future?
-    scope.dt = driftTracking.correlator(scope, scope.piFoc, stackHalfSize = 7)
+    scope.dt = driftTracking.Correlator(scope, scope.piFoc, stackHalfSize = 4)
     dtp = driftTrackGUI.DriftTrackingControl(MainFrame, scope.dt)
     MainFrame.camPanels.append((dtp, 'Focus Lock'))
     MainFrame.time1.WantNotification.append(dtp.refresh)
