@@ -126,11 +126,11 @@ def filter_wheel(MainFrame,scope):
     filtList = [WFilter(1, 'GFP', 'GFP exciter', 0),
                 WFilter(2, 'TxRed' , 'TxRed exciter', 0),
                 WFilter(3, 'Cy5'  , 'Cy5 exciter'  , 0),
-                WFilter(4, 'Cy5.5', 'Cy5.5 exciter', 0),
+                WFilter(4, 'Cy5.5-now empty', 'Cy5.5 exciter', 0),
                 WFilter(5, 'Cy7'  , 'Cy7 exciter'  , 0),
-                WFilter(6, 'ND4'  , 'UVND 4'  , 0)]
+                WFilter(6, 'empty'  , 'UVND 4'  , 0)]
     try:
-        scope.filterWheel = FiltWheel(filtList, 'COM7')
+        scope.filterWheel = FiltWheel(filtList, 'COM11')
         #scope.filterWheel.SetFilterPos("LF488")
         scope.filtPan = FiltFrame(MainFrame, scope.filterWheel)
         MainFrame.toolPanels.append((scope.filtPan, 'Filter Wheel'))
