@@ -15,14 +15,14 @@
           stream: ext://sys.stdout
 
       file:
-          class: logging.handlers.RotatingFileHandler
+          class: logging.FileHandler
           level: DEBUG
           formatter: simple
-          filename: PYMEAcquire.log #Alter to make sure directory is OK - this will dump log in current directory
-          maxBytes: 1000000
-          backupCount: 3
-
+          filename: PYMEAcquire.log
+          #maxBytes: 1000000
+          #backupCount: 3
+          mode: w # we currently overwrite when the app is started
 
   root:
       level: DEBUG
-      handlers: [console, file ]
+      handlers: [console, file]
