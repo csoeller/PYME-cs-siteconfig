@@ -74,10 +74,8 @@ def pz(scope):
 def init_xy(scope):
     from PYME.Acquire.Hardware.Piezos import piezo_c867
     scope.xystage = piezo_c867.piezo_c867T('COM9')
-    # we comment out the joystick part since we do not have a joystick
-    # and it seems to hang if we manipulate the joystick state through the interface button
-    #scope.joystick = piezo_c867.c867Joystick(scope.xystage)
-    #scope.joystick.Enable(True)
+    scope.joystick = piezo_c867.c867Joystick(scope.xystage)
+    scope.joystick.Enable(True)
     scope.hardwareChecks.append(scope.xystage.OnTarget)
     scope.CleanupFunctions.append(scope.xystage.close)
 
