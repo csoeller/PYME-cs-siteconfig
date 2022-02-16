@@ -60,6 +60,22 @@ def focus_keys_z(MainFrame,scope):
     fk = focusKeys.FocusKeys(MainFrame, scope.piezos[0], scope=scope)
     MainFrame.time1.WantNotification.append(fk.refresh)
 
+@init_gui('Filter Wheel 1')
+def filter_wheel(MainFrame,scope):
+    from PYME.Acquire.Hardware.FilterWheel import WFilter, FiltFrame, FiltWheel
+    filtList = [WFilter(1, 'EMPTY', 'EMPTY', 0),
+                WFilter(2, 'ND.5' , 'UVND 0.5', 0.5),
+                WFilter(3, 'ND1'  , 'UVND 1'  , 1),
+                WFilter(4, 'ND2', 'UVND 2', 2),
+                WFilter(5, 'ND3'  , 'UVND 3'  , 3),
+                WFilter(6, 'ND4'  , 'UVND 4'  , 4)]
+    try:
+        scope.filterWheel = FiltWheel(filtList, 'COM10')
+        #scope.filterWheel.SetFilterPos("LF488")
+        scope.filtPan = FiltFrame(MainFrame, scope.filterWheel)
+        MainFrame.toolPanels.append((scope.filtPan, 'Filter Wheel'))
+    except:
+        print('Error starting filter wheel ...')
 
 @init_gui('Filter Wheel 2')
 def filter_wheel(MainFrame,scope):
