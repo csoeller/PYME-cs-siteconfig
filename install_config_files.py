@@ -11,6 +11,7 @@ def stderrprint(*args, **kwargs):
 def update_config_file(rootdir,mode):
     initpath =  os.path.abspath(os.path.join(rootdir,'init_scripts'))
     logging_config_path = os.path.abspath(os.path.join(rootdir,'logging/pymeacquire-logging.yaml'))
+    splitter_data_path = os.path.abspath(os.path.join(rootdir,'dyeRatios/dyeRatios.json'))
     
     from string import Template
     t = Template('''
@@ -25,6 +26,7 @@ adding the following lines to the "$mode" config.yaml file:
                          'logging_config_path': logging_config_path}))
 
     config.update_config({'PYMEAcquire-extra_init_dir': initpath,
+                          'SplitterRatioDatabase': splitter_data_path,
                           'Acquire-logging_conf_file': logging_config_path},
                          config=mode, create_backup=True)
 #    for dir in config.config_dirs:
