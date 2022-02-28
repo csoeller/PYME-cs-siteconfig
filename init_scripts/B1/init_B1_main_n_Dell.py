@@ -76,7 +76,10 @@ def init_xy(scope):
     scope.xystage = piezo_c867.piezo_c867T('COM9')
     scope.joystick = piezo_c867.c867Joystick(scope.xystage)
     scope.joystick.Enable(True)
-    scope.hardwareChecks.append(scope.xystage.OnTarget)
+    # the hardware check below will hang the camera after timeouts; must not use it because we will
+    # disable the servo on acquisition, this will mean that the hardware check will always fail
+    # which will stop any camera restart attempst by the frameWrangler!!!!!
+    # scope.hardwareChecks.append(scope.xystage.OnTarget)
     scope.CleanupFunctions.append(scope.xystage.close)
 
     scope.register_piezo(scope.xystage, 'x', channel=1) # David's code has an extra ...,needCamRestart=True)
