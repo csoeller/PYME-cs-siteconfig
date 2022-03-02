@@ -34,7 +34,7 @@ def cam(scope):
         cam = UEyeCamera(0, 12)
     cam.SetIntegTime(1.0) # by default we use 1s integration time
     # possibly set preamp gain as well - check!
-    scope.register_camera(cam, 'Drift')
+    scope.register_camera(cam, 'Ueye')
 
 @init_gui('Camera controls')
 def cam_control(MainFrame, scope):
@@ -69,7 +69,8 @@ def zpiezo(scope):
 @init_hardware('XY Stage')
 def init_xy(scope):
     from PYME.Acquire.Hardware.Mercury import mercuryStepperGCS
-    scope.stage = mercuryStepper.mercuryStepper(comPort='COMXX', baud=115200, axes=['X', 'Y'], steppers=['M-229.25S', 'M-229.25S'])
+    scope.stage = mercuryStepper.mercuryStepper(comPort='COMXX', baud=115200,
+                                                axes=['X', 'Y'], steppers=['M-229.25S', 'M-229.25S'])
     scope.stage.SetSoftLimits(0, [1.06, 20.7])
     scope.stage.SetSoftLimits(1, [.8, 17.6])
 
