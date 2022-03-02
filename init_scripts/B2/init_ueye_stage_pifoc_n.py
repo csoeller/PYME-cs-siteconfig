@@ -39,8 +39,8 @@ def cam(scope):
 @init_gui('Camera controls')
 def cam_control(MainFrame, scope):
     from PYME.Acquire.Hardware.uc480 import ucCamControlFrame
-    scope.camControls['Drift'] = ucCamControlFrame.ucCamPanel(MainFrame, scope.cameras['Drift'], scope)
-    MainFrame.camPanels.append((scope.camControls['Drift'], 'Drift Cam Properties'))
+    scope.camControls['Ueye'] = ucCamControlFrame.ucCamPanel(MainFrame, scope.cameras['Ueye'], scope)
+    MainFrame.camPanels.append((scope.camControls['Ueye'], 'Ueye Cam Properties'))
 
 # #PIFoc
 # @init_hardware('PIFoc')
@@ -59,7 +59,7 @@ def cam_control(MainFrame, scope):
 def zpiezo(scope):
     from PYME.Acquire.Hardware.Piezos import piezo_e816, offsetPiezoREST
 
-    scope._piFoc = piezo_e816.piezo_e816T('COMXX', 400, 0, False)
+    scope._piFoc = piezo_e816.piezo_e816T('COM14', 400, 0, False)
     scope.CleanupFunctions.append(scope._piFoc.close)
 
     scope.piFoc = offsetPiezoREST.server_class()(scope._piFoc)
@@ -69,8 +69,8 @@ def zpiezo(scope):
 @init_hardware('XY Stage')
 def init_xy(scope):
     from PYME.Acquire.Hardware.Mercury import mercuryStepperGCS
-    scope.stage = mercuryStepper.mercuryStepper(comPort='COMXX', baud=115200,
-                                                axes=['X', 'Y'], steppers=['M-229.25S', 'M-229.25S'])
+    scope.stage = mercuryStepperGCS.mercuryStepper(comPort='COM12', baud=115200,
+                                                axes=['A', 'B'], steppers=['M-229.25S', 'M-229.25S'])
     scope.stage.SetSoftLimits(0, [1.06, 20.7])
     scope.stage.SetSoftLimits(1, [.8, 17.6])
 
