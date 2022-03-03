@@ -70,7 +70,7 @@ def zpiezo(scope):
 def init_xy(scope):
     from PYME.Acquire.Hardware.Mercury import mercuryStepperGCS
     scope.stage = mercuryStepperGCS.mercuryStepper(comPort='COM12', baud=115200,
-                                                axes=['A', 'B'], steppers=['M-229.25S', 'M-229.25S'])
+                                                axes=['X', 'Y'], steppers=['M-229.25S', 'M-229.25S'])
     scope.stage.SetSoftLimits(0, [1.06, 20.7])
     scope.stage.SetSoftLimits(1, [.8, 17.6])
 
