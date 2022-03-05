@@ -23,37 +23,25 @@
 from PYME.Acquire.ExecTools import joinBGInit, HWNotPresent, init_gui, init_hardware
 import time
 
-@init_hardware('Cameras')
-def cam(scope):
-    if True:
-        from PYME.Acquire.Hardware.uc480 import uCam480
-        uCam480.init(cameratype='ueye')
-        cam = uCam480.uc480Camera(0,nbits=12)
-    else: # use the pyueye interface
-        from PYME.Acquire.Hardware.ueye import UEyeCamera
-        cam = UEyeCamera(0, 12)
-    cam.SetIntegTime(1.0) # by default we use 1s integration time
-    # possibly set preamp gain as well - check!
-    scope.register_camera(cam, 'Ueye')
-
-@init_gui('Camera controls')
-def cam_control(MainFrame, scope):
-    from PYME.Acquire.Hardware.uc480 import ucCamControlFrame
-    scope.camControls['Ueye'] = ucCamControlFrame.ucCamPanel(MainFrame, scope.cameras['Ueye'], scope)
-    MainFrame.camPanels.append((scope.camControls['Ueye'], 'Ueye Cam Properties'))
-
-# #PIFoc
-# @init_hardware('PIFoc')
-# def pifoc(scope):
-#     from PYME.Acquire.Hardware.Piezos import piezo_e709, offsetPiezoREST
-
-#     # check COM Port number
-#     scope._piFoc = piezo_e709.piezo_e709T('COM11', 400, 0, True)
-#     #scope.hardwareChecks.append(scope.piFoc.OnTarget)
-#     scope.CleanupFunctions.append(scope._piFoc.close)
-
-#     scope.piFoc = offsetPiezoREST.server_class()(scope._piFoc)
-#     scope.register_piezo(scope.piFoc, 'z', needCamRestart=True)
+@init_hardware('Andor Zyla')
+def init_zyla(scope):
+    from PYME.Acquire.Hardware.AndorNeo import AndorZyla
+    cam =  AndorZyla.AndorZyla(0)
+    cam.Init()
+    cam.port = 'R100'
+    cam.orientation = dict(rotate=False, flipx=False, flipy=False)
+    cam.DefaultEMGain = 0 #hack to make camera work with standard protocols
+    cam.SetROI(512,512,1024,1024)
+    #cam.SetSimpleGainMode('16-bit (low noise & high well capacity)')
+    
+    scope.register_camera(cam, 'Zyla')
+    scope.StatusCallbacks.append(cam.TemperatureStatusText)
+    
+@init_gui('Zyla Controls')
+def zyla_controls(MainFrame,scope):
+    from PYME.Acquire.Hardware.AndorNeo import ZylaControlPanel
+    scope.camControls['Zyla'] = ZylaControlPanel.ZylaControl(MainFrame, scope.cameras['Zyla'], scope)
+    MainFrame.camPanels.append((scope.camControls['Zyla'], 'sCMOS Properties'))
 
 @init_hardware('Z Piezo')
 def zpiezo(scope):
