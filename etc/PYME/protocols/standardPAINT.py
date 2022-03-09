@@ -25,13 +25,21 @@
 from PYME.Acquire.protocol import *
 import numpy
 
+def joystickSet_Safe(state):
+    try:
+        scope.joystick.Enable(state)
+    except AttributeError:
+        pass
+
 #define a list of tasks, where T(when, what, *args) creates a new task
 #when is the frame number, what is a function to be called, and *args are any
 #additional arguments
 taskList = [
-T(-1, SetCameraShutter, False),
-T(20, SetCameraShutter, True),
-T(30, MainFrame.pan_spool.OnBAnalyse, None),
+    T(-1, SetCameraShutter, False),
+    T(-1, joystickSet_Safe, False),
+    T(20, SetCameraShutter, True),
+    T(30, MainFrame.pan_spool.OnBAnalyse, None),
+    T(maxint, joystickSet_Safe, True),
 ]
 
 #optional - metadata entries
