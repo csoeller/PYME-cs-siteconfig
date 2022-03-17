@@ -15,7 +15,7 @@
           stream: ext://sys.stdout
 
       file:
-          class: logging.TimedRotatingFileHandler
+          class: logging.handlers.TimedRotatingFileHandler
           level: DEBUG
           formatter: simple
           filename: PYMEAcquire.log
