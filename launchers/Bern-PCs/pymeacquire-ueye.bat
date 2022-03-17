@@ -8,6 +8,7 @@ set PATH=c:\ProgramData\Miniconda3\condabin;C:\Program Files\IDS\uEye\develop\bi
 
 call conda.bat activate pyme-shared
 
+cd \python-support-files\pymelogs\ueye
 pymeacquire -i %INITPATH%\generic\init_ui306x_n.py
 
 call conda deactivate
