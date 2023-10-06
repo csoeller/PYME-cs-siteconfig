@@ -3,8 +3,8 @@ setlocal
 
 rem
 set PATH=c:\ProgramData\Miniconda3\condabin;%PATH%
-
-call conda.bat activate pyme-shared
+if not defined PYMEENV ( set PYMEENV="pyme-shared" )
+call conda.bat activate %PYMEENV%
 
 dh5view %1
 
