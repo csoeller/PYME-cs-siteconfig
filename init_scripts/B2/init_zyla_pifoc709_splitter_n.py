@@ -32,7 +32,9 @@ def init_zyla(scope):
     cam.orientation = dict(rotate=False, flipx=False, flipy=False)
     cam.DefaultEMGain = 0 #hack to make camera work with standard protocols
     cam.SetROI(512,512,1024,1024)
-    #cam.SetSimpleGainMode('16-bit (low noise & high well capacity)')
+    hdmodes = [ match for match in cam.PixelEncodingForGain.keys() if match.startswith('16-bit')]
+    if len(hdmodes) > 0:
+        cam.SetSimpleGainMode(hdmodes[0])
     
     scope.register_camera(cam, 'Zyla')
     scope.StatusCallbacks.append(cam.TemperatureStatusText)
@@ -43,43 +45,24 @@ def zyla_controls(MainFrame,scope):
     scope.camControls['Zyla'] = ZylaControlPanel.ZylaControl(MainFrame, scope.cameras['Zyla'], scope)
     MainFrame.camPanels.append((scope.camControls['Zyla'], 'sCMOS Properties'))
 
-@init_gui('Drift tracking')
-def init_driftTracking(MainFrame,scope):
-    # we changed this to PYMEcs, i.e. our extra code
-    from PYMEcs.Acquire.Hardware import driftTracking, driftTrackGUI
-    # we limit stacksize to 2*7+1, possibly less in future?
-    scope.dt = driftTracking.Correlator(scope, scope.piFoc, stackHalfSize = 4)
-    dtp = driftTrackGUI.DriftTrackingControl(MainFrame, scope.dt)
-    MainFrame.camPanels.append((dtp, 'Focus Lock'))
-    MainFrame.time1.WantNotification.append(dtp.refresh)
-
 @init_hardware('Z Piezo')
 def zpiezo(scope):
-    from PYME.Acquire.Hardware.Piezos import piezo_e816, offsetPiezoREST
+    from PYME.Acquire.Hardware.Piezos import piezo_e709, offsetPiezoREST
 
-    scope._piFoc = piezo_e816.piezo_e816T('COM15', 400, 0, False)
+    scope._piFoc = piezo_e709.piezo_e709T('COM11')
     scope.CleanupFunctions.append(scope._piFoc.close)
 
     scope.piFoc = offsetPiezoREST.server_class()(scope._piFoc)
-    scope.register_piezo(scope.piFoc, 'z') # David's code has an extra ...,needCamRestart=True)
+    scope.register_piezo(scope.piFoc, 'z', needCamRestart=True) # David's code has an extra ...,needCamRestart=True)
 
+@init_gui('splitter')
+def ini_splitter(MainFrame,scope):
+    from PYME.Acquire.Hardware import splitter
 
-@init_hardware('XY Stage')
-def init_xy(scope):
-    from PYME.Acquire.Hardware.Mercury import mercuryStepperGCS
-    scope.stage = mercuryStepperGCS.mercuryStepper(comPort='COM12', baud=115200,
-                                                   axes=['X', 'Y'], steppers=['M-229.25S', 'M-229.25S'])
-    scope.stage.SetSoftLimits(0, [1.06, 20.7])
-    scope.stage.SetSoftLimits(1, [.8, 17.6])
-
-    scope.register_piezo(scope.stage, 'x', needCamRestart=True, channel=0, multiplier=1)
-    scope.register_piezo(scope.stage, 'y', needCamRestart=True, channel=1, multiplier=-1)
-
-    scope.joystick = scope.stage.joystick
-    scope.joystick.Enable(True)
-
-    scope.CleanupFunctions.append(scope.stage.Cleanup)
-
+    scope.splt = splitter.Splitter(MainFrame, scope, scope.cameras['Zyla'],
+                                   flipChan = 0, dichroic = 'T710LPXXR',
+                                   transLocOnCamera = 'Left', flip=False,
+                                   dir='left_right', constrain=False)
 
 @init_gui('Focus Keys')
 def focus_keys(MainFrame, scope):
