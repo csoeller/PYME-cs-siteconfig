@@ -23,6 +23,18 @@
 from PYME.Acquire.ExecTools import joinBGInit, HWNotPresent, init_gui, init_hardware
 import time
 
+# Set a microscope name which describes this hardware configuration (e.g. a room number or similar)
+# Used with the splitting ratio database and in other places where a microscope identifier is required.
+scope.microscope_name = 'Nikon-B2' # Nikon System Bern number 2
+
+from PYME.IO import MetaDataHandler
+# here we are trying some hard coded sample info
+def samplemdh_append(mdh):
+    mdh['Sample.Specimen'] = 'red beads in PBS'
+    mdh.setEntry('Sample.Labelling',[('beads','RedBeads')])
+    
+MetaDataHandler.provideStartMetadata.append(samplemdh_append)
+
 @init_hardware('Andor sCMOS 1')
 def init_scmos1(scope):
     from PYME.Acquire.Hardware.AndorNeo import AndorZyla
@@ -30,7 +42,7 @@ def init_scmos1(scope):
     cam.Init()
     cam.orientation = dict(rotate=False, flipx=False, flipy=False)
     cam.DefaultEMGain = 0 #hack to make camera work with standard protocols
-    cam.SetROI(512,512,1024,1024)
+    # cam.SetROI(512,512,1024,1024)
     hdmodes = [ match for match in cam.PixelEncodingForGain.keys() if match.startswith('16-bit')]
     if len(hdmodes) > 0:
         cam.SetSimpleGainMode(hdmodes[0])
@@ -52,7 +64,7 @@ def init_scmos2(scope):
     cam.Init()
     cam.orientation = dict(rotate=False, flipx=False, flipy=False)
     cam.DefaultEMGain = 0 #hack to make camera work with standard protocols
-    cam.SetROI(512,512,1024,1024)
+    # cam.SetROI(512,512,1024,1024)
     hdmodes = [ match for match in cam.PixelEncodingForGain.keys() if match.startswith('16-bit')]
     if len(hdmodes) > 0:
         cam.SetSimpleGainMode(hdmodes[0])
@@ -92,17 +104,23 @@ def zpiezo(scope):
 @init_gui('splitter')
 def ini_splitter(MainFrame,scope):
     from PYME.Acquire.Hardware import splitter
-
+    constrainwidth = 550 # we constrain the width of the ROI region to 550 pixels; maximum is 1024 for the whole width
+    chipwidth = scope.cameras['Zyla'].GetCCDWidth()
     scope.splt = splitter.Splitter(MainFrame, scope, scope.cameras['Zyla'],
-                                   flipChan = 0, dichroic = 'T710LPXXR',
+                                   flipChan = 0, dichroic = 'BS50-50',
                                    transLocOnCamera = 'Left', flip=False,
-                                   dir='left_right', constrain=False)
+                                   dir='left_right', constrain=False, border=int(int(chipwidth/2)-constrainwidth))
 
 @init_gui('Focus Keys')
 def focus_keys(MainFrame, scope):
     from PYME.Acquire.Hardware import focusKeys
     fk = focusKeys.FocusKeys(MainFrame, scope.piezos[0])
     MainFrame.time1.WantNotification.append(fk.refresh)
+
+@init_gui('Analysis Settings')
+def analysis_settings(MainFrame, scope):
+    from PYME.Acquire.ui import AnalysisSettingsUI
+    AnalysisSettingsUI.Plug(scope, MainFrame)
 
 
 #must be here!!!
