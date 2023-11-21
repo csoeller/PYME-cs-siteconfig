@@ -54,7 +54,7 @@ def roi_calibration(MainFrame, scope):
         camera_chip_calibration_series(scope)
 
     # MainFrame.AddMenuItem('Calibration', 'Camera Maps>Test ROI actions', roi_action_callback) # this was just a test
-    MainFrame.AddMenuItem('Calibration', 'Camera Maps>Tile over Chip ROIs', camera_chip_calibration_callback,
+    MainFrame.AddMenuItem('Camera Calibration', 'Camera Maps>Tile over Chip ROIs', camera_chip_calibration_callback,
                           helpText='Acquire data for camera maps by tiling acquisitions over the full chip size')
 
 @init_gui('Action manager')

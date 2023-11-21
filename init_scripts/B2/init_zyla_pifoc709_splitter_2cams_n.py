@@ -105,11 +105,17 @@ def zpiezo(scope):
 def ini_splitter(MainFrame,scope):
     from PYME.Acquire.Hardware import splitter
     constrainwidth = 550 # we constrain the width of the ROI region to 550 pixels; maximum is 1024 for the whole width
+    chipheight = scope.camera['Zyla'].GetCCDHeight()
     chipwidth = scope.cameras['Zyla'].GetCCDWidth()
+    chipwidth_h = int(chipwidth/2) # do we need to check for non-even width?
+    borderwidth = int(int(chipwidth/2)-constrainwidth) # border size to leave on the left and on the right side
     scope.splt = splitter.Splitter(MainFrame, scope, scope.cameras['Zyla'],
                                    flipChan = 0, dichroic = 'BS50-50',
                                    transLocOnCamera = 'Left', flip=False,
-                                   dir='left_right', constrain=False, border=int(int(chipwidth/2)-constrainwidth))
+                                   dir='left_right', constrain=False, border=0,
+                                   # ROI format x1,y1,x2,y2 with x2, y2 EXCLUDED from the ROI
+                                   rois = [[borderwidth,0,chipwidth_h,chipheight],
+                                           [chipwidth_h,0,chipwidth-borderwidth,chipheight]])
 
 @init_gui('Focus Keys')
 def focus_keys(MainFrame, scope):
