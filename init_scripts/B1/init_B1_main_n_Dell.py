@@ -138,6 +138,19 @@ def filter_wheel(MainFrame,scope):
     except:
         print('Error starting filter wheel ...')
 
+
+# Alex attempt to add dual colour and 3D
+#
+#@init_gui('splitter')
+#def ini_splitter(MainFrame,scope):  
+#    from PYME.Acquire.Hardware import splitter
+#
+#    splt = splitter.Splitter(MainFrame, scope, scope.cameras['Zyla'], flipChan = 0,
+#                             transLocOnCamera = 'bottom', flip=False, dir='up_down', constrain=False, dichroic='T710LPXXR-785R')
+
+
+
+
 @init_hardware('Lasers & Shutters')
 def lasers(scope):
     from PYME.Acquire.Hardware import phoxxLaser
@@ -146,8 +159,11 @@ def lasers(scope):
     scope.CleanupFunctions.append(scope.l647.Close)
     from PYME.Acquire.Hardware import cobaltLaser
     scope.l561 = cobaltLaser.CobaltLaserE('l561',portname='COM5',minpower=0.1,maxpower=0.2,scopeState = scope.state)
-    scope.l488 = cobaltLaser.CobaltLaserE('l488',portname='COM6',minpower=0.005,maxpower=0.2,scopeState = scope.state)  
-    scope.lasers = [scope.l647,scope.l561,scope.l488]
+    #scope.l488 = cobaltLaser.CobaltLaserE('l488',portname='COM6',minpower=0.005,maxpower=0.2,scopeState = scope.state)
+    
+    scope.l405 = cobaltLaser.CobaltLaserE('l405',portname='COM6',minpower=0.001, maxpower=0.1,scopeState = scope.state)    
+    scope.lasers = [scope.l647,scope.l561, scope.l405]#scope.l488]#, scope.l405]  #Alex edit this and above added 405 is def COM6?
+    #scope.l405.register(scope)
 
 @init_gui('Laser Sliders')
 def laser_sliders(MainFrame, scope):

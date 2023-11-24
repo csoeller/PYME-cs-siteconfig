@@ -110,7 +110,7 @@ def init_xy(scope):
 
 
 @init_gui('splitter')
-def ini_splitter(MainFrame,scope):
+def init_splitter(MainFrame,scope):
     from PYME.Acquire.Hardware import splitter
     splt = splitter.Splitter(MainFrame, scope, scope.cameras['Ixon'], flipChan = 0,
                              transLocOnCamera = 'bottom', flip=False, dir='up_down', constrain=False, dichroic='T710LPXXR-785R')

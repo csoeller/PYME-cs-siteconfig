@@ -14,3 +14,5 @@ call conda.bat activate %PYMEENV%
 dh5view %1
 
 call conda deactivate
+
+cmd /k
