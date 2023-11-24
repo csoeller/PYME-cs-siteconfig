@@ -3,14 +3,9 @@ setlocal
 
 rem
 
-set PATH=c:\ProgramData\Miniconda3\condabin;%PATH%
-if not defined PYMEENV ( set PYMEENV="pyme-shared" )
+set PATH=c:\ProgramData\Miniconda3\condabin;C:\python-support-files\PYME-cs-siteconfig\launchers\bin;%PATH%
 
-echo *****************************************
-echo starting in conda environment %PYMEENV%
-echo *****************************************
-
-call conda.bat activate %PYMEENV%
+call conda-activate-chosen-env.bat
 
 PYMEVis %1
 
