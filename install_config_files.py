@@ -5,6 +5,11 @@ import os
 import sys
 from distutils.dir_util import copy_tree
 
+# this seems needed so that we can actually see the copying messages from copy_tree
+# see also: https://stackoverflow.com/questions/17712722/dir-util-copy-tree-wont-print-the-files-that-it-copies
+import logging
+logging.basicConfig(level=logging.INFO)
+
 def stderrprint(*args, **kwargs):
     print(*args, file=sys.stderr, **kwargs)
 
@@ -46,7 +51,7 @@ def main():
         installdir = config.user_config_dir
         mode = 'user'
 
-    stderrprint("\nINSTALLING protocol files\n\tinstalling protocol files into %s..." % installdir)
+    stderrprint("\nINSTALLING protocol and camera files\ninstalling files into %s...\n" % installdir)
     copy_tree(os.path.join(this_dir, 'etc', 'PYME'), installdir, verbose=1)
     update_config_file(this_dir,mode)
 
