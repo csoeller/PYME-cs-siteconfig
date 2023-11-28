@@ -109,8 +109,10 @@ def ini_splitter(MainFrame,scope):
     chipwidth = scope.cameras['Zyla'].GetCCDWidth()
     chipwidth_h = int(chipwidth/2) # do we need to check for non-even width?
     borderwidth = int(int(chipwidth/2)-constrainwidth) # border size to leave on the left and on the right side
-    rois = [[borderwidth,0,chipwidth_h,chipheight],
-            [chipwidth_h,0,chipwidth-borderwidth,chipheight]]
+    rois = [[borderwidth,0,constrainwidth,chipheight], # format x0,y0,w,h
+            [chipwidth_h,0,constrainwidth,chipheight]]
+    # rois = [[borderwidth,0,chipwidth_h,chipheight], # format x0,y0,x1,y1
+    #        [chipwidth_h,0,chipwidth-borderwidth,chipheight]]
     scope.splt = splitter.Splitter(MainFrame, scope, scope.cameras['Zyla'],
                                    flipChan = 0, dichroic = 'BS50-50',
                                    transLocOnCamera = 'Left', flip=False,
