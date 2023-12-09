@@ -10,8 +10,9 @@ from distutils.dir_util import copy_tree
 import logging
 logging.basicConfig(level=logging.INFO)
 
-def stderrprint(*args, **kwargs):
-    print(*args, file=sys.stderr, **kwargs)
+from distutils import log
+log.set_verbosity(log.INFO)
+log.set_threshold(log.INFO)
 
 def update_config_file(rootdir,mode):
     initpath =  os.path.abspath(os.path.join(rootdir,'init_scripts'))
@@ -24,11 +25,13 @@ adding the following lines to the "$mode" config.yaml file:
 
     PYMEAcquire-extra_init_dir: "$initpath"
     Acquire-logging_conf_file: "$logging_config_path"
+    SplitterRatioDatabase: "$splitter_data_path"
 
 ''')
-    print(t.substitute({ 'initpath': initpath,
-                         'mode': mode,
-                         'logging_config_path': logging_config_path}))
+    logging.info(t.substitute({ 'initpath': initpath,
+                                'mode': mode,
+                                'logging_config_path': logging_config_path,
+                                'splitter_data_path': splitter_data_path}))
 
     config.update_config({'PYMEAcquire-extra_init_dir': initpath,
                           'SplitterRatioDatabase': splitter_data_path,
@@ -51,7 +54,7 @@ def main():
         installdir = config.user_config_dir
         mode = 'user'
 
-    stderrprint("\nINSTALLING protocol and camera files\ninstalling files into %s...\n" % installdir)
+    logging.info("\nINSTALLING protocol and camera files\ninstalling files into %s...\n" % installdir)
     copy_tree(os.path.join(this_dir, 'etc', 'PYME'), installdir, verbose=1)
     update_config_file(this_dir,mode)
 
