@@ -24,10 +24,10 @@
 - localisations.MergeClumps:
     discardTrivial: true
     inputName: with_clumps
-    outputName: coalesced
+    outputName: coalesced_nz
 - PYMEcs.DBSCANClustering2:
     clumpColumnName: dyeID
-    inputName: coalesced
+    inputName: coalesced_nz
     outputName: dbscanClusteredDyes
     searchRadius: 4.0
     sizeColumnName: dyeClumpSize
