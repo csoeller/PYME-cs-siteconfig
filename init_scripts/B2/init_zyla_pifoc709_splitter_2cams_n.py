@@ -116,7 +116,7 @@ def ini_splitter(MainFrame,scope):
     scope.splt = splitter.Splitter(MainFrame, scope, scope.cameras['Zyla'],
                                    flipChan = 0, dichroic = 'BS50-50',
                                    transLocOnCamera = 'Left', flip=False,
-                                   dir='left_right', constrain=False, border=borderwidth,
+                                   dir='left_right', constrain=False, # constrainedBorderSize=borderwidth,
                                    # ROI format x1,y1,x2,y2 with x2, y2 EXCLUDED from the ROI
                                    rois = rois)
 
