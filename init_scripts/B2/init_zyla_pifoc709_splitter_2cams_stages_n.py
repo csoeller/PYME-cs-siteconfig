@@ -118,6 +118,7 @@ def xy_stage(scope):
     scope.joystick = scope.stage.joystick
     scope.CleanupFunctions.append(scope.stage.close)
 
+    # note that both stages need to be started in the same thread as the pitools.startup calls seem not thread safe!!!
     scope.fine_stage = GCSPiezoThreaded('PI E-727 Controller SN 0123022828', axes = ['1', '2', '3'],
                                         update_rate=0.01)
     scope.register_piezo(scope.fine_stage, 'x_fine', needCamRestart=False, channel=0, multiplier=1)
