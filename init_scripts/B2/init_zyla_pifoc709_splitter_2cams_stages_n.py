@@ -101,12 +101,12 @@ def zpiezo(scope):
     scope.piFoc = offsetPiezoREST.server_class()(scope._piFoc)
     scope.register_piezo(scope.piFoc, 'z', needCamRestart=True) # David's code has an extra ...,needCamRestart=True)
 
-@init_hardware('XY Stage')
+@init_hardware('XY and 3D Fine Stage')
 def xy_stage(scope):
     from PYME.Acquire.Hardware.Piezos.piezo_pipython_gcs import GCSPiezoThreaded # needs to use our updates from piezo-pipython-tweaks branch
-    from PYMEcs.Acquire.Hardware.Piezos.joystick_c867_digital import digitalJoystick
+    from PYMEcs.Acquire.Hardware.Piezos.joystick_c867_digital import DigitalJoystick
     scope.stage = GCSPiezoThreaded('PI C-867 Piezomotor Controller SN 0122013807', axes=['1', '2'],
-                                   refmodes='FRF',joystick=digitalJoystick())
+                                   refmodes='FRF',joystick=DigitalJoystick())
     scope.stage.units_um = 1000 # need to check how this is used, i.e. implies that units on the controller are in mm or nm? 
     # the stage should match the camera reference frame -
     # i.e. the 'x' channel should be the one which results in lateral
@@ -115,16 +115,14 @@ def xy_stage(scope):
     # NOTE: need to check channel and multiplier for our system
     scope.register_piezo(scope.stage, 'x', needCamRestart=False, channel=0, multiplier=-1)
     scope.register_piezo(scope.stage, 'y', needCamRestart=False, channel=1, multiplier=1)
+    scope.joystick = scope.stage.joystick
     scope.CleanupFunctions.append(scope.stage.close)
 
-@init_hardware('3D Fine Stage')
-def fine_stage(scope):
     scope.fine_stage = GCSPiezoThreaded('PI E-727 Controller SN 0123022828', axes = ['1', '2', '3'],
-                                        update_rate=0.005)
+                                        update_rate=0.01)
     scope.register_piezo(scope.fine_stage, 'x_fine', needCamRestart=False, channel=0, multiplier=1)
     scope.register_piezo(scope.fine_stage, 'y_fine', needCamRestart=False, channel=1, multiplier=1)
     scope.register_piezo(scope.fine_stage, 'z_fine', needCamRestart=False, channel=2, multiplier=1)
-
     scope.CleanupFunctions.append(scope.fine_stage.close)
 
 @init_gui('splitter')
