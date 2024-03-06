@@ -28,15 +28,16 @@ def init_zyla(scope):
     from PYME.Acquire.Hardware.AndorNeo import AndorZyla
     cam =  AndorZyla.AndorZyla(0)
     cam.Init()
-    cam.orientation = dict(rotate=False, flipx=False, flipy=False) # we may want to tweak this
+    # cam.orientation = dict() # we may want to tweak this NOTE: gets overwritten in register_camera call!!!!
     cam.DefaultEMGain = 0 #hack to make camera work with standard protocols
     cam.SetROI(512,512,1024,1024)
     #cam.SetSimpleGainMode('16-bit (low noise & high well capacity)')
     hdmodes = [ match for match in cam.PixelEncodingForGain.keys() if match.startswith('16-bit')]
     if len(hdmodes) > 0:
         cam.SetSimpleGainMode(hdmodes[0])
-  
-    scope.register_camera(cam, 'sCMOS')
+
+    # any orientation etc config and camera port setting MUST be handled here, not by directly accessing the cam object
+    scope.register_camera(cam, 'sCMOS', rotate=True, flipx=False, flipy=False)
     scope.StatusCallbacks.append(cam.TemperatureStatusText)
     
 @init_gui('sCMOS Controls')
@@ -62,12 +63,39 @@ def zpiezo(scope):
 
     scope.piFoc = offsetPiezoRESTCorrelLog.getServer()(scope._piFoc)
     scope.register_piezo(scope.piFoc, 'z', needCamRestart=True) # David's code has an extra ...,needCamRestart=True)
+
+@init_hardware('XY and 3D Fine Stage')
+def xy_stage(scope):
+    from PYME.Acquire.Hardware.Piezos.piezo_pipython_gcs import GCSPiezoThreaded # needs to use our updates from piezo-pipython-tweaks branch
+    from PYMEcs.Acquire.Hardware.Piezos.joystick_c867_digital import DigitalJoystick
+    scope.stage = GCSPiezoThreaded('PI C-867 Piezomotor Controller SN 0122013807', axes=['1', '2'],
+                                   refmodes='FRF',joystick=DigitalJoystick())
+    scope.stage.units_um = 1000 # need to check how this is used, i.e. implies that units on the controller are in mm or nm? 
+    # the stage should match the camera reference frame -
+    # i.e. the 'x' channel should be the one which results in lateral
+    # movement on the camera, and the y channel should result in vertical movement on the camera
+    # multipliers should be set (+1 or -1) so that the direction also matches.
+    # NOTE: need to check channel and multiplier for our system
+    scope.register_piezo(scope.stage, 'x', needCamRestart=False, channel=0, multiplier=-1)
+    scope.register_piezo(scope.stage, 'y', needCamRestart=False, channel=1, multiplier=1)
+    scope.joystick = scope.stage.joystick
+    scope.CleanupFunctions.append(scope.stage.close)
+
+    # note that both stages need to be started in the same thread as the pitools.startup calls seem not thread safe!!!
+    scope.fine_stage = GCSPiezoThreaded('PI E-727 Controller SN 0123022828', axes = ['1', '2', '3'],
+                                        update_rate=0.01)
+    scope.register_piezo(scope.fine_stage, 'x_fine', needCamRestart=False, channel=0, multiplier=1)
+    scope.register_piezo(scope.fine_stage, 'y_fine', needCamRestart=False, channel=1, multiplier=1)
+    scope.register_piezo(scope.fine_stage, 'z_fine', needCamRestart=False, channel=2, multiplier=1)
+    scope.CleanupFunctions.append(scope.fine_stage.close)
+
     
 @init_gui('Drift tracking')
 def init_driftTracking(MainFrame,scope):
     # we changed this to PYMEcs, i.e. our extra code
-    from PYMEcs.Acquire.Hardware import driftTracking, driftTrackGUI
-    # we limit stacksize to 2*7+1, possibly less in future?
+    from PYMEcs.Acquire.Hardware import driftTracking_n as driftTracking
+    from PYMEcs.Acquire.Hardware import driftTrackGUI_n as driftTrackGUI
+    # we limit stacksize to 2*4+1, possibly even less in future?
     scope.dt = driftTracking.Correlator(scope, scope.piFoc, stackHalfSize = 4)
     dtp = driftTrackGUI.DriftTrackingControl(MainFrame, scope.dt)
     MainFrame.camPanels.append((dtp, 'Focus Lock'))
