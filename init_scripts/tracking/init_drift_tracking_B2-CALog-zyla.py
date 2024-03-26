@@ -97,9 +97,9 @@ def init_driftTracking(MainFrame,scope):
     from PYMEcs.Acquire.Hardware import driftTrackGUI_n as driftTrackGUI
     # we limit stacksize to 2*4+1, possibly even less in future?
     # we now use the new style correlator with "correction piezos"
-    scope.dt = driftTracking.Correlator(scope, scope.piFoc, remote_logger=scope.pifoc,
-                                        corr_zpiezo=driftTracking.CorrectionPiezoOP(scope.pifoc),
-                                        # corr_zpiezo=driftTracking.CorrectionPiezo(scope.fine_stage, axis=2, multiplier=1.0),
+    scope.dt = driftTracking.Correlator(scope, scope.piFoc, remote_logger=scope.piFoc,
+                                        #corr_zpiezo=driftTracking.CorrectionPiezoOP(scope.piFoc),
+                                        corr_zpiezo=driftTracking.CorrectionPiezo(scope.fine_stage, axis=2, multiplier=-1.0),
                                         stackHalfSize=4)
     dtp = driftTrackGUI.DriftTrackingControl(MainFrame, scope.dt)
     MainFrame.camPanels.append((dtp, 'Focus Lock'))
