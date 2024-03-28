@@ -100,10 +100,13 @@ def init_driftTracking(MainFrame,scope):
     # we now use the new style correlator with "correction piezos"
     scope.dt = driftTracking.Correlator(scope, scope.piFoc, remote_logger=scope.piFoc,
                                         #corr_zpiezo=driftTracking.CorrectionPiezoOP(scope.piFoc),
+                                        # the axis and multiplier settings match our current local setup
+                                        # needs checking for any other setup
                                         corr_zpiezo=CorrectionPiezo(scope.fine_stage, axis=2, multiplier=-1.0),
                                         corr_xpiezo=CorrectionPiezo(scope.fine_stage, axis=1, multiplier=-1.0),
                                         corr_ypiezo=CorrectionPiezo(scope.fine_stage, axis=0, multiplier=1.0),
-                                        stackHalfSize=4)
+                                        focusTolerance=0.025, xyTolerance=0.01, stackHalfSize=4)
+    
     dtp = driftTrackGUI.DriftTrackingControl(MainFrame, scope.dt)
     MainFrame.camPanels.append((dtp, 'Focus Lock'))
     MainFrame.time1.WantNotification.append(dtp.refresh)
