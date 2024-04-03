@@ -82,12 +82,12 @@ def xy_stage(scope):
     scope.CleanupFunctions.append(scope.stage.close)
 
     # note that both stages need to be started in the same thread as the pitools.startup calls seem not thread safe!!!
-    scope.fine_stage = GCSPiezoThreaded('PI E-727 Controller SN 0123022828', axes = ['1', '2', '3'],
+    scope._fine_stage = GCSPiezoThreaded('PI E-727 Controller SN 0123022828', axes = ['1', '2', '3'],
                                         update_rate=0.01)
-    scope.register_piezo(scope.fine_stage, 'x_fine', needCamRestart=False, channel=0, multiplier=1)
-    scope.register_piezo(scope.fine_stage, 'y_fine', needCamRestart=False, channel=1, multiplier=1)
-    scope.register_piezo(scope.fine_stage, 'z_fine', needCamRestart=False, channel=2, multiplier=1)
-    scope.CleanupFunctions.append(scope.fine_stage.close)
+    #scope.register_piezo(scope.fine_stage, 'x_fine', needCamRestart=False, channel=0, multiplier=1)
+    #scope.register_piezo(scope.fine_stage, 'y_fine', needCamRestart=False, channel=1, multiplier=1)
+    #scope.register_piezo(scope.fine_stage, 'z_fine', needCamRestart=False, channel=2, multiplier=1)
+    scope.CleanupFunctions.append(scope._fine_stage.close)
 
     
 @init_gui('Drift tracking')
@@ -98,15 +98,14 @@ def init_driftTracking(MainFrame,scope):
     from PYMEcs.Acquire.Hardware.driftTracking_n import CorrectionPiezo
     # we limit stacksize to 2*4+1, possibly even less in future?
     # we now use the new style correlator with "correction piezos"
-    scope.dt = driftTracking.Correlator(scope, scope.piFoc, remote_logger=scope.piFoc,
-                                        #corr_zpiezo=driftTracking.CorrectionPiezoOP(scope.piFoc),
+    scope.dt = driftTracking.Correlator(scope, main_zpiezo=scope.piFoc, remote_logger=scope.piFoc,
+                                        # corr_zpiezo=CorrectionPiezoOP(scope.piFoc),
                                         # the axis and multiplier settings match our current local setup
                                         # needs checking for any other setup
-                                        corr_zpiezo=CorrectionPiezo(scope.fine_stage, axis=2, multiplier=-1.0),
-                                        corr_xpiezo=CorrectionPiezo(scope.fine_stage, axis=1, multiplier=-1.0),
-                                        corr_ypiezo=CorrectionPiezo(scope.fine_stage, axis=0, multiplier=1.0),
-                                        focusTolerance=0.025, xyTolerance=0.01, stackHalfSize=4)
-    
+                                        corr_zpiezo=CorrectionPiezo(scope._fine_stage, axis=2, multiplier=-1.0),
+                                        corr_xpiezo=CorrectionPiezo(scope._fine_stage, axis=1, multiplier=-1.0),
+                                        corr_ypiezo=CorrectionPiezo(scope._fine_stage, axis=0, multiplier=1.0),
+                                        focusTolerance=0.025, xyTolerance=0.01, stackHalfSize=4, logLocal=False)    
     dtp = driftTrackGUI.DriftTrackingControl(MainFrame, scope.dt)
     MainFrame.camPanels.append((dtp, 'Focus Lock'))
     MainFrame.time1.WantNotification.append(dtp.refresh)
