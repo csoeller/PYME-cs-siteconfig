@@ -1,0 +1,18 @@
+'4102669729':
+    comment: a Sona entry that should ultimately cover our new camera
+    model: ueye
+    noise_properties:
+        12-bit:
+            ElectronsPerCount: 2.706
+            ReadNoise: 2.425
+            ADOffset: 7.67
+            SaturationThreshold: 4095
+'4108562922':
+    comment: a Sona entry that should ultimately cover our new camera
+    model: ueye
+    noise_properties:
+        12-bit:
+            ElectronsPerCount: 2.706
+            ReadNoise: 2.425
+            ADOffset: 7.67
+            SaturationThreshold: 4095
